@@ -1,50 +1,59 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# Blue Collar Marketplace Constitution
 
-## Core Principles
+## Core Philosophy & Mission
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+A mobile-first platform connecting workers and customers for real-world services like agriculture, labor, home services, and more.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+- Simplicity over complexity
+- Trust-first system
+- Category-driven matching
+- Ethiopia-first design
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+## Engineering Principles
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+- **Clarity over Cleverness**: Code must be readable and easy to understand.
+- **Simple First**: Start with the simplest solution and iterate. MVP approach.
+- **Correctness**: Code must be accurate and robust.
+- **Testing**: Tests are mandatory to ensure functionality and prevent regressions.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+## Security Baseline
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+- **Authorization by Default**: All access must be authorized unless explicitly public.
+- **Validate Inputs**: All incoming data, whether from clients or third parties, must be strictly validated.
+- **Least Privilege**: Components and users should only have the permissions necessary to perform their function.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+## DX Conventions
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+- **File Naming & Folder Structure**: Standardize naming according to the established Next.js App Router structure.
+- **Commit Hygiene**: Clean, descriptive, and atomic commits.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Documentation Expectations
 
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+- `spec.md`, `plan.md`, and `tasks.md` are the source of truth for features and must be continuously updated. Keep documentation aligned with the SDD Workflow.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+## Performance Expectations
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+- **Avoid N+1 Queries**: Ensure database data fetching is optimized.
+- **Pagination**: Implement pagination for lists and sets of items.
+- **Indexes**: Apply database indexes where needed to support performance.
+
+## Repo-Specific Defaults
+
+- **Supabase Architecture**: Next.js + Supabase. All Supabase access must go through Next.js API routes or Server Actions. Web and Flutter clients never talk to Supabase directly.
+- **Prompt Engineering**: Prefer concise editor prompts. Avoid huge documentation blocks in prompts; keep explanations in chat summaries.
+
+## User-provided constraints
+
+- **Technology Stack**: Next.js (App Router, TypeScript), Supabase (PostgreSQL, Auth, Storage), Tailwind CSS.
+- **Architecture**: Frontend: Next.js App Router; Backend: Server Actions + Supabase; Database: PostgreSQL.
+- **Core Features**: Worker profiles, Customer job posting, Service listings, Booking system, Reviews and verification.
+- **Data Model Overview**:
+  - Key tables: users, worker_profiles, customer_profiles, service_categories, worker_categories, worker_services, job_posts, bookings, reviews.
+- **Matching Logic**: Workers receive jobs based on selected categories.
+- **Booking Flow**: Customer → request → worker accepts → job → review.
+- **Folder Structure**: src/, app/, features/, components/, lib/, server/.
+- **Development Phases**: Foundation, Auth, Categories, Jobs, Booking, Reviews, Notifications, Admin.
+- **SDD Workflow**: spec.md → plan.md → tasks.md → implementation.
+- **Future Features**: Maps, Payments, AI matching.
+
+**Version**: 1.0.0 | **Ratified**: 2026-04-18
