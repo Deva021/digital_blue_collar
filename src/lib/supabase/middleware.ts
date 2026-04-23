@@ -49,23 +49,8 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && isProtectedRoute) {
-    // Only enforce worker profiles on worker-specific pages for now
-    const isWorkerRoute = request.nextUrl.pathname.startsWith('/worker') || request.nextUrl.pathname.startsWith('/dashboard')
-    const isOnboardingRoute = request.nextUrl.pathname.startsWith('/onboarding/worker')
-
-    if (isWorkerRoute && !isOnboardingRoute) {
-      const { data: profile } = await supabase
-        .from('worker_profiles')
-        .select('id')
-        .eq('id', user.id)
-        .single()
-
-      if (!profile) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/onboarding/worker'
-        return NextResponse.redirect(url)
-      }
-    }
+    // Phase 8: Onboarding is now optional, so no forced redirect here.
+    // Dashboard and individual routes will handle null profiles gracefully.
   }
 
 

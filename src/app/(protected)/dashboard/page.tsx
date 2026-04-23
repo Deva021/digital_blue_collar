@@ -17,7 +17,7 @@ export default async function DashboardPage() {
     .from('worker_profiles')
     .select('bio, availability_status')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-8 space-y-8">
@@ -28,11 +28,15 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm">
-          <h2 className="text-xl font-bold mb-4">Profile Summary</h2>
-          <p className="text-slate-700 whitespace-pre-wrap">{profile?.bio || "No bio set."}</p>
+          <h2 className="text-xl font-bold mb-4">{profile ? "Profile Summary" : "Ready to Work?"}</h2>
+          <p className="text-slate-700 whitespace-pre-wrap">
+            {profile ? (profile.bio || "No bio set.") : "You haven't created a worker profile yet. Set one up to start offering services on the marketplace."}
+          </p>
           <div className="mt-8 flex gap-3">
-             <Link href="/worker/settings/profile">
-               <Button variant="outline">Edit Profile</Button>
+             <Link href={profile ? "/worker/settings/profile" : "/onboarding/worker"}>
+               <Button variant={profile ? "outline" : undefined}>
+                 {profile ? "Edit Profile" : "Create Worker Profile"}
+               </Button>
              </Link>
           </div>
         </div>
