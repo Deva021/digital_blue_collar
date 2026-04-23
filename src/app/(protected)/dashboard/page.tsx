@@ -1,41 +1,53 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login')
+    redirect('/login');
   }
 
+  // Dashboard implies they are fully onboarded based on our middleware guard!
+  // We fetch their profile to welcome them.
+  const { data: profile } = await supabase
+    .from('worker_profiles')
+    .select('bio, availability_status')
+    .eq('id', user.id)
+    .single();
+
   return (
-    <div className="flex-1 p-8">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <div className="p-6 bg-white rounded-lg shadow-sm border space-y-4">
-          <p className="text-muted-foreground">
-            You are successfully authenticated.
-          </p>
-          <div className="bg-neutral-100 p-4 rounded-md">
-            <code className="text-sm">{user.email}</code>
+    <div className="max-w-6xl mx-auto p-4 sm:p-8 space-y-8">
+      <header className="flex flex-col gap-2">
+        <h1 className="text-4xl font-extrabold tracking-tight">Worker Dashboard</h1>
+        <p className="text-lg text-slate-500">Manage your jobs, availability, and profile.</p>
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm">
+          <h2 className="text-xl font-bold mb-4">Profile Summary</h2>
+          <p className="text-slate-700 whitespace-pre-wrap">{profile?.bio || "No bio set."}</p>
+          <div className="mt-8 flex gap-3">
+             <Link href="/worker/settings/profile">
+               <Button variant="outline">Edit Profile</Button>
+             </Link>
           </div>
-          
-          <form action={async () => {
-            'use server'
-            const supabase = await createClient()
-            await supabase.auth.signOut()
-            redirect('/login')
-          }}>
-            <Button type="submit">
-              Sign out
-            </Button>
-          </form>
+        </div>
+
+        <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-md">
+          <h2 className="text-lg font-semibold text-slate-200 mb-2">Status</h2>
+          <div className="flex items-center gap-3 mt-4">
+            <span className="relative flex h-3 w-3">
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${profile?.availability_status === 'available' ? 'bg-emerald-400' : 'bg-amber-400'}`}></span>
+              <span className={`relative inline-flex rounded-full h-3 w-3 ${profile?.availability_status === 'available' ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
+            </span>
+            <span className="font-medium capitalize">{profile?.availability_status || "Offline"}</span>
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

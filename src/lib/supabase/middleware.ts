@@ -33,7 +33,7 @@ export async function updateSession(request: NextRequest) {
 
   // Protect dashboard routes
   const isAuthPage = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup' || request.nextUrl.pathname === '/forgot-password'
-  const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/worker') || request.nextUrl.pathname.startsWith('/customer')
+  const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/worker') || request.nextUrl.pathname.startsWith('/customer') || request.nextUrl.pathname.startsWith('/onboarding')
 
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone()
@@ -47,6 +47,27 @@ export async function updateSession(request: NextRequest) {
     url.pathname = request.nextUrl.searchParams.get('next') ?? '/'
     return NextResponse.redirect(url)
   }
+
+  if (user && isProtectedRoute) {
+    // Only enforce worker profiles on worker-specific pages for now
+    const isWorkerRoute = request.nextUrl.pathname.startsWith('/worker') || request.nextUrl.pathname.startsWith('/dashboard')
+    const isOnboardingRoute = request.nextUrl.pathname.startsWith('/onboarding/worker')
+
+    if (isWorkerRoute && !isOnboardingRoute) {
+      const { data: profile } = await supabase
+        .from('worker_profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single()
+
+      if (!profile) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/onboarding/worker'
+        return NextResponse.redirect(url)
+      }
+    }
+  }
+
 
   return supabaseResponse
 }
