@@ -10,11 +10,12 @@ const initialState = {
   error: null as string | null
 }
 
-export function LoginForm() {
+export function LoginForm({ next = '/' }: { next?: string }) {
   const [state, formAction, pending] = useActionState(loginAction, initialState)
 
   return (
     <form action={formAction} className="space-y-4 w-full">
+      <input type="hidden" name="next" value={next} />
       {state?.error && (
         <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
           {state.error}

@@ -38,12 +38,13 @@ export async function updateSession(request: NextRequest) {
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    url.searchParams.set('next', request.nextUrl.pathname)
     return NextResponse.redirect(url)
   }
 
   if (user && isAuthPage) {
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard' // basic fallback authenticated route
+    url.pathname = request.nextUrl.searchParams.get('next') ?? '/'
     return NextResponse.redirect(url)
   }
 
