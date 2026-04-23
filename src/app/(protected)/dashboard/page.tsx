@@ -2,8 +2,13 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Briefcase, UserCircle, ArrowRight } from "lucide-react";
 
-export default async function DashboardPage() {
+export const metadata = {
+  title: "Dashboard - Digital Blue Collar",
+};
+
+export default async function UnifiedDashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -11,46 +16,85 @@ export default async function DashboardPage() {
     redirect('/login');
   }
 
-  // Dashboard implies they are fully onboarded based on our middleware guard!
-  // We fetch their profile to welcome them.
-  const { data: profile } = await supabase
-    .from('worker_profiles')
-    .select('bio, availability_status')
-    .eq('id', user.id)
-    .maybeSingle();
+  // Gracefully probe for existence of both profile types
+  const [customerRes, workerRes] = await Promise.all([
+    supabase.from('customer_profiles').select('id').eq('id', user.id).maybeSingle(),
+    supabase.from('worker_profiles').select('id').eq('id', user.id).maybeSingle()
+  ]);
+
+  const hasCustomer = !!customerRes.data;
+  const hasWorker = !!workerRes.data;
 
   return (
-    <div className="max-w-6xl mx-auto p-4 sm:p-8 space-y-8">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-4xl font-extrabold tracking-tight">Worker Dashboard</h1>
-        <p className="text-lg text-slate-500">Manage your jobs, availability, and profile.</p>
+    <div className="max-w-5xl mx-auto p-4 sm:p-8 space-y-10">
+      <header className="flex flex-col gap-2 border-b border-slate-200 pb-6">
+        <h1 className="text-4xl font-extrabold tracking-tight">Welcome back</h1>
+        <p className="text-lg text-slate-500">How would you like to use the marketplace today?</p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm">
-          <h2 className="text-xl font-bold mb-4">{profile ? "Profile Summary" : "Ready to Work?"}</h2>
-          <p className="text-slate-700 whitespace-pre-wrap">
-            {profile ? (profile.bio || "No bio set.") : "You haven't created a worker profile yet. Set one up to start offering services on the marketplace."}
-          </p>
-          <div className="mt-8 flex gap-3">
-             <Link href={profile ? "/worker/settings/profile" : "/onboarding/worker"}>
-               <Button variant={profile ? "outline" : undefined}>
-                 {profile ? "Edit Profile" : "Create Worker Profile"}
-               </Button>
-             </Link>
-          </div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+        
+        {/* Customer Portal Card */}
+        <Link href="/customer/dashboard" className="block group">
+          <div className="h-full p-8 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer relative overflow-hidden flex flex-col">
+            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+              <UserCircle size={100} />
+            </div>
+            
+            <div className="flex items-center gap-4 mb-4 relative z-10">
+              <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                <UserCircle size={28} />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900">Customer Area</h2>
+            </div>
+            
+            <p className="text-slate-600 text-lg mb-8 relative z-10 flex-grow">
+              Hire professionals, manage your active job postings, and review your bookings.
+            </p>
 
-        <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-md">
-          <h2 className="text-lg font-semibold text-slate-200 mb-2">Status</h2>
-          <div className="flex items-center gap-3 mt-4">
-            <span className="relative flex h-3 w-3">
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${profile?.availability_status === 'available' ? 'bg-emerald-400' : 'bg-amber-400'}`}></span>
-              <span className={`relative inline-flex rounded-full h-3 w-3 ${profile?.availability_status === 'available' ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
-            </span>
-            <span className="font-medium capitalize">{profile?.availability_status || "Offline"}</span>
+            <div className="flex items-center justify-between border-t border-slate-100 pt-6 relative z-10">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                  <span className={`h-2.5 w-2.5 rounded-full ${hasCustomer ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
+                  <span className="text-slate-500">{hasCustomer ? "Profile Active" : "Requires Setup"}</span>
+              </div>
+              <span className="flex items-center text-blue-600 font-semibold group-hover:translate-x-1 transition-transform">
+                Enter Portal <ArrowRight className="ml-2 w-4 h-4" />
+              </span>
+            </div>
           </div>
-        </div>
+        </Link>
+
+
+        {/* Worker Portal Card */}
+        <Link href="/worker/dashboard" className="block group">
+          <div className="h-full p-8 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:indigo-blue-300 transition-all cursor-pointer relative overflow-hidden flex flex-col">
+            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+              <Briefcase size={100} />
+            </div>
+            
+            <div className="flex items-center gap-4 mb-4 relative z-10">
+              <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
+                <Briefcase size={28} />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900">Worker Portal</h2>
+            </div>
+            
+            <p className="text-slate-600 text-lg mb-8 relative z-10 flex-grow">
+              Discover local jobs, manage your service offerings, and update your availability.
+            </p>
+
+            <div className="flex items-center justify-between border-t border-slate-100 pt-6 relative z-10">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                  <span className={`h-2.5 w-2.5 rounded-full ${hasWorker ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
+                  <span className="text-slate-500">{hasWorker ? "Profile Active" : "Requires Setup"}</span>
+              </div>
+              <span className="flex items-center text-indigo-600 font-semibold group-hover:translate-x-1 transition-transform">
+                Enter Portal <ArrowRight className="ml-2 w-4 h-4" />
+              </span>
+            </div>
+          </div>
+        </Link>
+        
       </div>
     </div>
   );

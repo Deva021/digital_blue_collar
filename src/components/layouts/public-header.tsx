@@ -49,7 +49,7 @@ export function PublicHeader({ user }: { user?: any }) {
                 </button>
                 <Link href="/dashboard" className={buttonVariants({ variant: "outline", className: "gap-2" })}>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                  Profile
+                  Dashboard
                 </Link>
               </>
             ) : (
@@ -72,7 +72,7 @@ export function PublicHeader({ user }: { user?: any }) {
               <>
                 <Link href="/dashboard" className={buttonVariants({ size: "sm", variant: "outline", className: "h-8 px-3 text-xs gap-1" })}>
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                  Profile
+                  Dashboard
                 </Link>
                 <button onClick={handleSignOut} className="p-1.5 text-red-500 hover:bg-red-50 rounded-md focus:outline-none" aria-label="Sign out">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,7 +127,7 @@ export function PublicHeader({ user }: { user?: any }) {
                  <div className="flex flex-col gap-3">
                    <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className={buttonVariants({ variant: "outline", className: "w-full justify-center gap-2" })}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                    Profile Dashboard
+                    Dashboard
                   </Link>
                   <button onClick={() => { handleSignOut(); setMobileMenuOpen(false); }} className="w-full text-sm font-bold text-red-600 py-3 hover:bg-red-50 rounded-md transition-colors border border-red-100 bg-red-50/50">
                     Sign out securely
