@@ -48,8 +48,8 @@ export function WorkerOnboardingForm() {
           setError("root", { type: "server", message: response.message });
         }
       } else {
-        // Success redirect
-        router.push("/dashboard");
+        // Success redirect - immediately send them to fill out categories
+        router.push("/worker/settings/profile");
       }
     });
   };

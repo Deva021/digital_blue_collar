@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { workerCategoriesSchema } from "@/lib/validations/category";
 
-export async function upsertWorkerCategories(formData: FormData) {
+export async function upsertWorkerCategories(categoryIds: string[]) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -13,7 +13,6 @@ export async function upsertWorkerCategories(formData: FormData) {
       return { error: "Unauthorized" };
     }
 
-    const categoryIds = formData.getAll("categories").map(String);
     const result = workerCategoriesSchema.safeParse({ categories: categoryIds });
 
     if (!result.success) {

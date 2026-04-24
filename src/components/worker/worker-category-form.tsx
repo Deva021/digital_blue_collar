@@ -43,10 +43,7 @@ export function WorkerCategoryForm({
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const formData = new FormData();
-      Array.from(selectedIds).forEach((id) => formData.append("categories", id));
-
-      const result = await upsertWorkerCategories(formData);
+      const result = await upsertWorkerCategories(Array.from(selectedIds));
       if (result.error) {
         setError(result.error);
       }
@@ -74,8 +71,8 @@ export function WorkerCategoryForm({
               <p className="text-sm text-muted-500 mt-1 pl-6">{parent.description}</p>
             )}
 
-            {parent.children.length > 0 && selectedIds.has(parent.id) && (
-              <div className="mt-3 ml-6 space-y-2">
+            {parent.children.length > 0 && (
+              <div className="mt-3 ml-6 space-y-2 border-t border-muted-100 pt-3">
                 {parent.children.map((child) => (
                   <div key={child.id} className="flex items-center space-x-2">
                     <input
@@ -85,7 +82,7 @@ export function WorkerCategoryForm({
                       onChange={() => toggleCategory(child.id, parent.id)}
                       className="h-4 w-4 rounded border-muted-300 text-primary-600 focus:ring-primary-500"
                     />
-                    <label htmlFor={`cat-${child.id}`} className="text-sm">
+                    <label htmlFor={`cat-${child.id}`} className="text-sm cursor-pointer">
                       {child.name}
                     </label>
                   </div>
