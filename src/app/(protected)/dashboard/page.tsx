@@ -97,7 +97,6 @@ export default async function UnifiedDashboardPage() {
         
       </div>
 
-      {/* Quick Actions (Unified Route Integrations) */}
       <div className="pt-8 border-t border-slate-100">
         <h3 className="text-lg font-semibold text-slate-800 mb-4">Direct Access</h3>
         <div className="flex flex-wrap gap-4">
@@ -105,6 +104,12 @@ export default async function UnifiedDashboardPage() {
             <Button variant="outline" className="text-indigo-600 border-indigo-200 shadow-sm hover:bg-indigo-50">
               <Briefcase className="mr-2 h-4 w-4" />
               Manage My Services
+            </Button>
+          </Link>
+          <Link href="/dashboard/discover">
+            <Button variant="outline" className="text-emerald-600 border-emerald-200 shadow-sm hover:bg-emerald-50">
+              <ArrowRight className="mr-2 h-4 w-4" />
+              Discover Workers &amp; Jobs
             </Button>
           </Link>
         </div>
