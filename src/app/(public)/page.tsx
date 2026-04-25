@@ -132,15 +132,28 @@ export default function HomePage() {
             </div>
 
             <div className="bg-white p-8 rounded-3xl shadow-2xl border border-gray-100 relative">
-               <div className="absolute -top-6 -right-6 w-24 h-24 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 rounded-full" aria-hidden="true" />
-               <div className="space-y-6">
-                  <div className="h-12 w-3/4 bg-gray-100 rounded-xl animate-pulse" />
-                  <div className="h-24 w-full bg-gray-50 rounded-xl animate-pulse" />
-                  <div className="flex gap-4">
-                    <div className="h-10 w-24 bg-primary-100 rounded-lg animate-pulse" />
-                    <div className="h-10 w-24 bg-gray-100 rounded-lg animate-pulse" />
+               <div className="space-y-4">
+                  <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
+                    <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-sm">JD</div>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm">John D.</p>
+                      <p className="text-xs text-gray-500">Licensed Electrician · Addis Ababa</p>
+                    </div>
+                    <span className="ml-auto text-xs font-semibold px-2 py-1 bg-green-100 text-green-700 rounded-full">Available</span>
                   </div>
-                  <div className="h-40 w-full bg-gray-50 rounded-xl animate-pulse mt-8 border border-gray-100" />
+                  <p className="text-sm text-gray-600">"Professional residential and commercial wiring. 8 years experience with full certification."</p>
+                  <div className="flex gap-2 flex-wrap">
+                    <span className="text-xs bg-gray-100 text-gray-600 rounded-full px-3 py-1">Electrician</span>
+                    <span className="text-xs bg-gray-100 text-gray-600 rounded-full px-3 py-1">Wiring</span>
+                    <span className="text-xs bg-gray-100 text-gray-600 rounded-full px-3 py-1">Certified</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-amber-500 text-sm font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    4.9 · 132 jobs completed
+                  </div>
+                  <Link href="/workers" className="block mt-2 text-center text-sm font-semibold py-2.5 px-4 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-colors">
+                    View Profile
+                  </Link>
                </div>
             </div>
           </div>
