@@ -106,6 +106,12 @@ export default async function UnifiedDashboardPage() {
               Manage My Services
             </Button>
           </Link>
+          <Link href="/dashboard/jobs">
+            <Button variant="outline" className="text-blue-600 border-blue-200 shadow-sm hover:bg-blue-50">
+              <Briefcase className="mr-2 h-4 w-4" />
+              Manage My Job Posts
+            </Button>
+          </Link>
           <Link href="/dashboard/discover">
             <Button variant="outline" className="text-emerald-600 border-emerald-200 shadow-sm hover:bg-emerald-50">
               <ArrowRight className="mr-2 h-4 w-4" />
