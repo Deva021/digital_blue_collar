@@ -4,7 +4,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Card, CardTitle, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Briefcase } from "lucide-react";
+import { Plus, Briefcase, ChevronLeft } from "lucide-react";
 
 function getStatusBadge(status: string) {
   switch (status) {
@@ -24,6 +24,13 @@ export default async function DashboardJobsPage() {
 
   return (
     <div className="flex flex-col space-y-6">
+      <Link
+        href="/dashboard"
+        className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors w-fit"
+      >
+        <ChevronLeft className="w-4 h-4 mr-1" /> Back to Dashboard
+      </Link>
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">My Job Postings</h1>
@@ -45,7 +52,7 @@ export default async function DashboardJobsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {jobs.map(job => (
             <Link key={job.id} href={`/dashboard/jobs/${job.id}`}>
-              <Card className="h-full flex flex-col hover:shadow-md transition-shadow cursor-pointer border-slate-200 hover:border-blue-300">
+              <Card className="h-full flex flex-col hover:shadow-md transition-shadow cursor-pointer border-slate-200 hover:border-slate-300">
                 <CardHeader className="pb-3 border-b border-gray-50 flex-grow-0">
                   <div className="flex justify-between items-start gap-2">
                     <CardTitle className="text-lg leading-tight line-clamp-2">{job.title}</CardTitle>
@@ -59,8 +66,12 @@ export default async function DashboardJobsPage() {
                 <CardContent className="flex-1 pt-4">
                   <p className="line-clamp-3 text-sm text-gray-700">{job.description}</p>
                 </CardContent>
-                <CardFooter className="pt-0 pb-4 text-sm text-muted-foreground flex justify-between">
-                  <span>{job.budget_range ? `Budget: ${job.budget_range}` : 'No exact budget'}</span>
+                <CardFooter className="pt-0 pb-4 text-sm text-muted-foreground flex justify-between items-center">
+                  <span className="font-medium text-slate-800">
+                    {job.budget_range && job.budget_range !== 'null' && job.budget_range.trim() !== '' 
+                      ? `Budget: ${job.budget_range}` 
+                      : 'Open to receive quotes'}
+                  </span>
                   <span className="text-slate-400 text-xs">{new Date(job.created_at).toLocaleDateString()}</span>
                 </CardFooter>
               </Card>

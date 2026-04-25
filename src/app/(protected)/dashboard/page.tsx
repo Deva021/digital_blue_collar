@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Briefcase, UserCircle, ArrowRight } from "lucide-react";
+import { Briefcase, UserCircle, ArrowRight, ChevronLeft } from "lucide-react";
 
 export const metadata = {
   title: "Dashboard - Digital Blue Collar",
@@ -27,6 +27,13 @@ export default async function UnifiedDashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-8 space-y-10">
+      <Link
+        href="/"
+        className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors w-fit"
+      >
+        <ChevronLeft className="w-4 h-4 mr-1" /> Back to Home
+      </Link>
+
       <header className="flex flex-col gap-2 border-b border-slate-200 pb-6">
         <h1 className="text-4xl font-extrabold tracking-tight">Welcome back</h1>
         <p className="text-lg text-slate-500">How would you like to use the marketplace today?</p>
@@ -36,7 +43,7 @@ export default async function UnifiedDashboardPage() {
         
         {/* Customer Portal Card */}
         <Link href="/customer/dashboard" className="block group">
-          <div className="h-full p-8 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer relative overflow-hidden flex flex-col">
+          <div className="h-full p-8 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all cursor-pointer relative overflow-hidden flex flex-col">
             <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
               <UserCircle size={100} />
             </div>
@@ -57,7 +64,7 @@ export default async function UnifiedDashboardPage() {
                   <span className={`h-2.5 w-2.5 rounded-full ${hasCustomer ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
                   <span className="text-slate-500">{hasCustomer ? "Profile Active" : "Requires Setup"}</span>
               </div>
-              <span className="flex items-center text-blue-600 font-semibold group-hover:translate-x-1 transition-transform">
+              <span className="flex items-center text-slate-600 font-semibold group-hover:translate-x-1 transition-transform">
                 Enter Portal <ArrowRight className="ml-2 w-4 h-4" />
               </span>
             </div>
@@ -98,24 +105,24 @@ export default async function UnifiedDashboardPage() {
       </div>
 
       <div className="pt-8 border-t border-slate-100">
-        <h3 className="text-lg font-semibold text-slate-800 mb-4">Direct Access</h3>
-        <div className="flex flex-wrap gap-4">
-          <Link href="/dashboard/services">
-            <Button variant="outline" className="text-indigo-600 border-indigo-200 shadow-sm hover:bg-indigo-50">
-              <Briefcase className="mr-2 h-4 w-4" />
-              Manage My Services
-            </Button>
-          </Link>
-          <Link href="/dashboard/jobs">
-            <Button variant="outline" className="text-blue-600 border-blue-200 shadow-sm hover:bg-blue-50">
-              <Briefcase className="mr-2 h-4 w-4" />
-              Manage My Job Posts
-            </Button>
-          </Link>
-          <Link href="/dashboard/discover">
-            <Button variant="outline" className="text-emerald-600 border-emerald-200 shadow-sm hover:bg-emerald-50">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-6">Quick Links</h3>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Link href="/dashboard/discover" className="flex-1">
+            <Button variant="primary" className="w-full h-12 shadow-sm text-base">
               <ArrowRight className="mr-2 h-4 w-4" />
-              Discover Workers &amp; Jobs
+              Discover Marketplace
+            </Button>
+          </Link>
+          <Link href="/dashboard/jobs" className="flex-1">
+            <Button variant="outline" className="w-full h-12 border-slate-200 shadow-sm text-slate-700 bg-white hover:bg-slate-50 text-base">
+              <Briefcase className="mr-2 h-4 w-4 text-blue-500" />
+              My Job Posts
+            </Button>
+          </Link>
+          <Link href="/dashboard/services" className="flex-1">
+            <Button variant="outline" className="w-full h-12 border-slate-200 shadow-sm text-slate-700 bg-white hover:bg-slate-50 text-base">
+              <Briefcase className="mr-2 h-4 w-4 text-indigo-500" />
+              My Services
             </Button>
           </Link>
         </div>
