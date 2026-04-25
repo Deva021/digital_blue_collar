@@ -73,8 +73,11 @@ export function WorkerServiceForm({ categories, initialData, onSuccess }: Worker
         </div>
       )}
 
-      {/* Service Title */}
-      <div className="space-y-2">
+      <div className="space-y-6">
+        <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500 border-b pb-2">Service Details</h4>
+
+        {/* Service Title */}
+        <div className="space-y-2">
         <label htmlFor="title" className="text-sm font-semibold text-slate-900">
           Service Title
         </label>
@@ -112,19 +115,20 @@ export function WorkerServiceForm({ categories, initialData, onSuccess }: Worker
         {errors.category_id && <p className="text-xs text-red-500">{errors.category_id.message}</p>}
       </div>
 
-      {/* Description */}
-      <div className="space-y-2">
-        <label htmlFor="description" className="text-sm font-semibold text-slate-900">
-          Description
-        </label>
-        <Textarea
-          id="description"
-          placeholder="Describe your service in detail..."
-          rows={5}
-          {...register("description")}
-          className={errors.description ? "border-red-500" : ""}
-        />
-        {errors.description && <p className="text-xs text-red-500">{errors.description.message}</p>}
+        {/* Description */}
+        <div className="space-y-2">
+          <label htmlFor="description" className="text-sm font-semibold text-slate-900">
+            Description
+          </label>
+          <Textarea
+            id="description"
+            placeholder="Describe your service in detail..."
+            rows={5}
+            {...register("description")}
+            className={errors.description ? "border-red-500" : ""}
+          />
+          {errors.description && <p className="text-xs text-red-500">{errors.description.message}</p>}
+        </div>
       </div>
 
       {/* Pricing Section */}

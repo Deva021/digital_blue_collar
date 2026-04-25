@@ -57,7 +57,10 @@ export function JobPostForm({ categories }: { categories: CategoryWithChildren[]
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-6">
+        <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500 border-b pb-2">Job Description</h4>
+        
+        <div className="space-y-2">
         <Label htmlFor="title">Job Title</Label>
         <Input id="title" {...register("title")} placeholder="E.g., Need experienced plumber for bathroom remodel" />
         {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
@@ -101,7 +104,12 @@ export function JobPostForm({ categories }: { categories: CategoryWithChildren[]
         {errors.location_text && <p className="text-sm text-red-500">{errors.location_text.message}</p>}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      </div>
+
+      <div className="space-y-6 pt-4">
+        <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500 border-b pb-2">Requirements & Budget</h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="budget_range">Budget Estimate (Optional)</Label>
           <Input id="budget_range" {...register("budget_range")} placeholder="E.g., 2000-5000 ETB" />
@@ -115,14 +123,15 @@ export function JobPostForm({ categories }: { categories: CategoryWithChildren[]
         </div>
       </div>
 
-      <div className="flex items-center space-x-2 pt-2">
-        <input 
-          type="checkbox" 
-          id="is_negotiable" 
-          {...register("is_negotiable")}
-          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-        />
-        <Label htmlFor="is_negotiable" className="font-normal cursor-pointer">Budget is negotiable</Label>
+        <div className="flex items-center space-x-2 pt-2 pb-4">
+          <input 
+            type="checkbox" 
+            id="is_negotiable" 
+            {...register("is_negotiable")}
+            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+          />
+          <Label htmlFor="is_negotiable" className="font-normal cursor-pointer">Budget is negotiable</Label>
+        </div>
       </div>
 
       <div className="pt-4 border-t flex justify-end">
