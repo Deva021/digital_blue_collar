@@ -80,12 +80,16 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
         </div>
       </div>
       
-      {/* Fallback space for Applications table in Phase 14 */}
+      {/* Applications Management Section */}
       <div className="pt-8 border-t border-slate-200">
-        <h2 className="text-xl font-bold mb-4">Applications</h2>
-        <div className="p-12 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 text-center flex flex-col items-center">
-          <p className="text-slate-500 font-medium">Applications management will be available shortly.</p>
-          <span className="text-sm text-slate-400 mt-2">Check back later for incoming applications.</span>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">Applications</h2>
+            <p className="text-sm text-slate-500 mt-1">Manage workers who have applied for this job</p>
+          </div>
+          <Link href={`/dashboard/jobs/${job.id}/applications`} className={buttonVariants({ variant: "primary" })}>
+            View Applications
+          </Link>
         </div>
       </div>
     </div>

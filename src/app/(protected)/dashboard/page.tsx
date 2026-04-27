@@ -125,6 +125,12 @@ export default async function UnifiedDashboardPage() {
               My Services
             </Button>
           </Link>
+          <Link href="/dashboard/applications" className="flex-1">
+            <Button variant="outline" className="w-full h-12 border-slate-200 shadow-sm text-slate-700 bg-white hover:bg-slate-50 text-base">
+              <Briefcase className="mr-2 h-4 w-4 text-emerald-500" />
+              My Applications
+            </Button>
+          </Link>
         </div>
       </div>
       
