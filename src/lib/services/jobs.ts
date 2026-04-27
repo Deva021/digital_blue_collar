@@ -84,3 +84,78 @@ export async function getJobPostById(jobId: string) {
   if (error) return null;
   return data;
 }
+
+export async function getAvailableJobs() {
+  const supabase = await createClient();
+  const { data: authData } = await supabase.auth.getUser();
+  if (!authData.user) return [];
+
+  // TODO: Implement category filtering if supported based on worker_categories
+  // For MVP, just return all open jobs where customer != current user
+  
+  const { data, error } = await supabase
+    .from('job_posts')
+    .select(`*, service_categories(name)`)
+    .eq('status', 'open')
+    .neq('customer_id', authData.user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Fetch available jobs error:", error);
+    return [];
+  }
+  return data;
+}
+
+export async function getPublicJobById(jobId: string) {
+  const supabase = await createClient();
+  const { data: authData } = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from('job_posts')
+    .select(`*, service_categories(name)`)
+    .eq('id', jobId)
+    .single();
+
+  if (error || !data) return null;
+
+  // Check if there is an accepted worker for this job
+  const { count: acceptedCount } = await supabase
+    .from('job_applications')
+    .select('id', { count: 'exact', head: true })
+    .eq('job_post_id', jobId)
+    .eq('status', 'accepted');
+
+  const hasAcceptedWorker = acceptedCount ? acceptedCount > 0 : false;
+
+  let isOwner = false;
+  let hasApplied = false;
+  let applicationStatus = null;
+
+  if (authData.user) {
+    isOwner = data.customer_id === authData.user.id;
+    
+    if (!isOwner) {
+      const { data: appData } = await supabase
+        .from('job_applications')
+        .select('status')
+        .eq('job_post_id', jobId)
+        .eq('worker_id', authData.user.id)
+        .single();
+        
+      if (appData) {
+        hasApplied = true;
+        applicationStatus = appData.status;
+      }
+    }
+  }
+
+  return {
+    ...data,
+    isAuthenticated: !!authData.user,
+    isOwner,
+    hasApplied,
+    applicationStatus,
+    hasAcceptedWorker
+  };
+}
