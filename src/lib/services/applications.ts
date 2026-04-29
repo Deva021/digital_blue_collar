@@ -115,12 +115,11 @@ export async function getReceivedApplications(jobId: string) {
   return { job, applications: data };
 }
 
-export async function reviewApplicationAction(applicationId: string, status: 'accepted' | 'rejected') {
+export async function reviewApplicationAction(applicationId: string, status: 'rejected') {
   const supabase = await createClient();
   const { data: authData } = await supabase.auth.getUser();
   if (!authData.user) return { success: false, error: "Unauthorized" };
 
-  // First fetch the application to get the job_post_id
   const { data: application, error: appError } = await supabase
     .from('job_applications')
     .select('*, job_posts(customer_id)')
@@ -129,29 +128,13 @@ export async function reviewApplicationAction(applicationId: string, status: 'ac
 
   if (appError || !application) return { success: false, error: "Application not found" };
 
-  // Verify the current user is the owner of the job
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if ((application.job_posts as any)?.customer_id !== authData.user.id) {
     return { success: false, error: "Unauthorized: You do not own this job." };
   }
-  
+
   if (application.status !== 'pending') {
     return { success: false, error: "This application has already been reviewed." };
-  }
-
-  // If accepting, ensure there are no other accepted applications for this job
-  // (Assuming Phase 14 spec: only one accepted application per job)
-  if (status === 'accepted') {
-    const { count, error: countError } = await supabase
-      .from('job_applications')
-      .select('id', { count: 'exact', head: true })
-      .eq('job_post_id', application.job_post_id)
-      .eq('status', 'accepted');
-      
-    if (countError) return { success: false, error: countError.message };
-    if (count && count > 0) {
-      return { success: false, error: "This job already has an accepted worker." };
-    }
   }
 
   const { error: updateError } = await supabase
@@ -160,12 +143,102 @@ export async function reviewApplicationAction(applicationId: string, status: 'ac
     .eq('id', applicationId);
 
   if (updateError) {
-    console.error("Application review update error:", updateError);
+    console.error("Application reject error:", updateError);
     return { success: false, error: updateError.message };
   }
 
   revalidatePath(`/dashboard/jobs/${application.job_post_id}/applications`);
   revalidatePath('/dashboard/applications');
-  
+
   return { success: true };
+}
+
+export async function acceptApplicationAction(
+  applicationId: string,
+  scheduledAt: string,
+  locationText: string
+) {
+  const supabase = await createClient();
+  const { data: authData } = await supabase.auth.getUser();
+  if (!authData.user) return { success: false, error: "Unauthorized" };
+
+  // Validate inputs
+  if (!scheduledAt || new Date(scheduledAt) <= new Date()) {
+    return { success: false, error: "Scheduled time must be in the future." };
+  }
+  if (!locationText || locationText.trim().length < 3) {
+    return { success: false, error: "Location must be at least 3 characters." };
+  }
+
+  const { data: application, error: appError } = await supabase
+    .from('job_applications')
+    .select('*, job_posts(customer_id, id)')
+    .eq('id', applicationId)
+    .single();
+
+  if (appError || !application) return { success: false, error: "Application not found" };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const jobPosts = application.job_posts as any;
+  if (jobPosts?.customer_id !== authData.user.id) {
+    return { success: false, error: "Unauthorized: You do not own this job." };
+  }
+
+  if (application.status !== 'pending') {
+    return { success: false, error: "This application has already been reviewed." };
+  }
+
+  // Ensure no other accepted application exists for this job
+  const { count, error: countError } = await supabase
+    .from('job_applications')
+    .select('id', { count: 'exact', head: true })
+    .eq('job_post_id', application.job_post_id)
+    .eq('status', 'accepted');
+
+  if (countError) return { success: false, error: countError.message };
+  if (count && count > 0) {
+    return { success: false, error: "This job already has an accepted worker." };
+  }
+
+  // 1) Update application to accepted
+  const { error: updateError } = await supabase
+    .from('job_applications')
+    .update({ status: 'accepted' })
+    .eq('id', applicationId);
+
+  if (updateError) {
+    console.error("Application accept error:", updateError);
+    return { success: false, error: updateError.message };
+  }
+
+  // 2) Create booking record from the accepted application
+  const { data: booking, error: bookingError } = await supabase
+    .from('bookings')
+    .insert({
+      customer_id: authData.user.id,
+      worker_id: application.worker_id,
+      job_post_id: application.job_post_id,
+      final_price: application.proposed_price,
+      scheduled_at: scheduledAt,
+      location_text: locationText,
+      status: 'accepted',
+    })
+    .select('id')
+    .single();
+
+  if (bookingError) {
+    // Rollback application status
+    await supabase
+      .from('job_applications')
+      .update({ status: 'pending' })
+      .eq('id', applicationId);
+    console.error("Booking creation error after acceptance:", bookingError);
+    return { success: false, error: "Failed to create booking. Application acceptance reverted." };
+  }
+
+  revalidatePath(`/dashboard/jobs/${application.job_post_id}/applications`);
+  revalidatePath('/dashboard/applications');
+  revalidatePath('/dashboard/bookings');
+
+  return { success: true, bookingId: booking.id };
 }
