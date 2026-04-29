@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Briefcase, UserCircle, ArrowRight, ChevronLeft } from "lucide-react";
+import { Briefcase, UserCircle, ArrowRight, ChevronLeft, Calendar } from "lucide-react";
 
 export const metadata = {
   title: "Dashboard - Digital Blue Collar",
@@ -129,6 +129,12 @@ export default async function UnifiedDashboardPage() {
             <Button variant="outline" className="w-full h-12 border-slate-200 shadow-sm text-slate-700 bg-white hover:bg-slate-50 text-base">
               <Briefcase className="mr-2 h-4 w-4 text-emerald-500" />
               My Applications
+            </Button>
+          </Link>
+          <Link href="/dashboard/bookings" className="flex-1">
+            <Button variant="outline" className="w-full h-12 border-slate-200 shadow-sm text-slate-700 bg-white hover:bg-slate-50 text-base">
+              <Calendar className="mr-2 h-4 w-4 text-amber-500" />
+              My Bookings
             </Button>
           </Link>
         </div>

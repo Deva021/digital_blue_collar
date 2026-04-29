@@ -69,7 +69,7 @@ export default async function DashboardDiscoverPage(props: { searchParams?: Prom
       {type === 'jobs' ? (
         <JobList jobs={jobs} totalCount={jobsCount} clearLink={`/dashboard/discover?type=jobs`} />
       ) : (
-        <WorkerList workers={workers} totalCount={workersCount} clearLink={`/dashboard/discover?type=workers`} />
+        <WorkerList workers={workers || []} totalCount={workersCount} clearLink={`/dashboard/discover?type=workers`} isDashboard={true} />
       )}
     </div>
   );
