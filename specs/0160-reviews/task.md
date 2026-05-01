@@ -1,0 +1,10 @@
+- `[ ]` Task 1: Create Database Migration for Reviews Table
+- `[ ]` Task 2: Create SQL View/Function for Aggregate Ratings
+- `[ ]` Task 3: Create Review Validation Schemas
+- `[ ]` Task 4: Implement Review Service and Server Actions
+- `[ ]` Task 5: Create Interactive Star Rating Component
+- `[ ]` Task 6: Create Review Card Component
+- `[ ]` Task 7: Create Review Submission Form
+- `[ ]` Task 8: Integrate Reviews into Booking Details Page
+- `[ ]` Task 9: Display Aggregated Rating and Reviews on Worker Profile (if applicable)
+- `[ ]` Task 10: Display Aggregated Rating on Worker Cards
