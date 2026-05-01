@@ -15,10 +15,23 @@ export default async function WorkersPage(props: { searchParams?: Promise<{ [key
     page: typeof searchParams?.page === 'string' ? searchParams.page : '1',
   };
 
-  const [categories, { data: workers, count }] = await Promise.all([
+  const [categories, { data: rawWorkers, count }] = await Promise.all([
     getActiveCategories(),
     getPublicWorkers(filters)
   ]);
+
+  // Attach ratings dynamically
+  let workers = rawWorkers || [];
+  const { getWorkerRatingSummary } = await import("@/lib/services/reviews");
+  workers = await Promise.all(
+    workers.map(async (worker) => {
+      const rating = await getWorkerRatingSummary(worker.id);
+      return {
+        ...worker,
+        rating_summary: rating,
+      };
+    })
+  );
 
   return (
     <div className="container mx-auto px-4 py-12 md:py-20">

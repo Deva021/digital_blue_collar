@@ -1,5 +1,8 @@
 import { getBookingById } from "@/lib/services/bookings";
+import { getReviewByBookingId } from "@/lib/services/reviews";
 import { BookingDetailView } from "@/components/bookings/BookingDetailView";
+import { ReviewSubmissionForm } from "@/components/reviews/ReviewSubmissionForm";
+import { ReviewCard } from "@/components/reviews/ReviewCard";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -19,6 +22,9 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
     notFound();
   }
 
+  const isCustomer = booking.currentUserId === booking.customer_id;
+  const review = await getReviewByBookingId(id);
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <Link
@@ -29,6 +35,19 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
       </Link>
 
       <BookingDetailView booking={booking} />
+
+      {review && (
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Review for this booking
+          </h3>
+          <ReviewCard review={review} />
+        </div>
+      )}
+
+      {!review && isCustomer && booking.status === "completed" && (
+        <ReviewSubmissionForm bookingId={booking.id} workerId={booking.worker_id} />
+      )}
     </div>
   );
 }

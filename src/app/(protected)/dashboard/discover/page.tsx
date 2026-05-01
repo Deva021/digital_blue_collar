@@ -34,6 +34,18 @@ export default async function DashboardDiscoverPage(props: { searchParams?: Prom
     const res = await getPublicWorkers(filters);
     workers = res.data || [];
     workersCount = res.count;
+
+    // Attach ratings dynamically
+    const { getWorkerRatingSummary } = await import("@/lib/services/reviews");
+    workers = await Promise.all(
+      workers.map(async (worker) => {
+        const rating = await getWorkerRatingSummary(worker.id);
+        return {
+          ...worker,
+          rating_summary: rating,
+        };
+      })
+    );
   }
 
   const getTabHref = (targetType: string) => {
