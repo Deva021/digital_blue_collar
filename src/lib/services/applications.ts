@@ -99,9 +99,9 @@ export async function getReceivedApplications(jobId: string) {
     .select(`
       *,
       worker_profiles (
-        first_name,
-        last_name,
-        bio
+        id,
+        bio,
+        location_text
       )
     `)
     .eq('job_post_id', jobId)
