@@ -63,6 +63,7 @@ export default async function JobApplicationsPage({ params }: { params: Promise<
                 status={app.status}
                 createdAt={app.created_at}
                 jobHasAccepted={hasAcceptedApplication}
+                verificationStatus={app.worker_profiles?.verification_status}
               />
             ))}
           </div>

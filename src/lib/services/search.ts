@@ -23,6 +23,7 @@ export async function getPublicWorkers(filters: SearchFilters) {
       bio,
       location_text,
       availability_status,
+      verification_status,
       created_at,
       worker_categories!inner ( category_id ),
       worker_services ( id, base_price, is_negotiable, description, service_categories(name) )

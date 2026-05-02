@@ -101,7 +101,8 @@ export async function getReceivedApplications(jobId: string) {
       worker_profiles (
         id,
         bio,
-        location_text
+        location_text,
+        verification_status
       )
     `)
     .eq('job_post_id', jobId)

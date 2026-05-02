@@ -5,6 +5,7 @@ import { reviewApplicationAction, acceptApplicationAction } from "@/lib/services
 import { ApplicationStatusBadge } from "./ApplicationStatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { VerifiedBadge } from "@/components/ui/VerifiedBadge";
 import { User, Check, X, Calendar, MapPin } from "lucide-react";
 
 type ApplicantProps = {
@@ -15,6 +16,7 @@ type ApplicantProps = {
   status: string;
   createdAt: string;
   jobHasAccepted: boolean;
+  verificationStatus?: string;
 };
 
 export function ApplicantCard({
@@ -25,6 +27,7 @@ export function ApplicantCard({
   status,
   createdAt,
   jobHasAccepted,
+  verificationStatus,
 }: ApplicantProps) {
   const [isPending, startTransition] = useTransition();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -92,7 +95,10 @@ export function ApplicantCard({
                 <div className="bg-slate-100 p-2 rounded-full hidden sm:block">
                   <User className="w-4 h-4 text-slate-500" />
                 </div>
-                {workerName}
+                <div className="flex items-center gap-1.5">
+                  {workerName}
+                  {verificationStatus === 'verified' && <VerifiedBadge />}
+                </div>
               </h3>
               <div className="md:hidden">
                 <ApplicationStatusBadge status={status} />

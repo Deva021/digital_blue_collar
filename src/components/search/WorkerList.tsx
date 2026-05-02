@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { SearchPagination } from './SearchPagination';
 import { EmptyState } from '@/components/ui/empty-state';
 import { buttonVariants } from '@/components/ui/button';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 export function WorkerList({ 
   workers, 
@@ -40,7 +41,10 @@ export function WorkerList({
             <Card key={worker.id} className="flex flex-col hover:shadow-md transition-shadow">
               <CardHeader className="pb-3 border-b border-gray-100">
                 <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg">{worker.full_name || 'Professional Worker'}</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <CardTitle className="text-lg">{worker.full_name || 'Professional Worker'}</CardTitle>
+                    {worker.verification_status === 'verified' && <VerifiedBadge />}
+                  </div>
                   {worker.availability_status === 'available' && (
                     <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-none">Available</Badge>
                   )}
