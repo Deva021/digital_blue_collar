@@ -2,7 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Briefcase, UserCircle, ArrowRight, ChevronLeft, Calendar } from "lucide-react";
+import { Briefcase, UserCircle, ArrowRight, ChevronLeft, Calendar, Bell } from "lucide-react";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 export const metadata = {
   title: "Dashboard - Digital Blue Collar",
@@ -34,9 +35,12 @@ export default async function UnifiedDashboardPage() {
         <ChevronLeft className="w-4 h-4 mr-1" /> Back to Home
       </Link>
 
-      <header className="flex flex-col gap-2 border-b border-slate-200 pb-6">
-        <h1 className="text-4xl font-extrabold tracking-tight">Welcome back</h1>
-        <p className="text-lg text-slate-500">How would you like to use the marketplace today?</p>
+      <header className="flex items-start justify-between gap-4 border-b border-slate-200 pb-6">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-4xl font-extrabold tracking-tight">Welcome back</h1>
+          <p className="text-lg text-slate-500">How would you like to use the marketplace today?</p>
+        </div>
+        <NotificationBell />
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
@@ -135,6 +139,12 @@ export default async function UnifiedDashboardPage() {
             <Button variant="outline" className="w-full h-12 border-slate-200 shadow-sm text-slate-700 bg-white hover:bg-slate-50 text-base">
               <Calendar className="mr-2 h-4 w-4 text-amber-500" />
               My Bookings
+            </Button>
+          </Link>
+          <Link href="/dashboard/notifications" className="flex-1">
+            <Button variant="outline" className="w-full h-12 border-slate-200 shadow-sm text-slate-700 bg-white hover:bg-slate-50 text-base">
+              <Bell className="mr-2 h-4 w-4 text-rose-500" />
+              Notifications
             </Button>
           </Link>
         </div>
