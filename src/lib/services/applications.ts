@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { applicationSchema, ApplicationFormValues } from "../validations/application";
+import { createNotification } from "@/server/notifications/actions";
+import { NOTIFICATION_TYPES } from "@/lib/constants/notifications";
 
 export async function applyToJobAction(data: ApplicationFormValues) {
   const supabase = await createClient();
@@ -51,6 +53,15 @@ export async function applyToJobAction(data: ApplicationFormValues) {
   revalidatePath(`/jobs/${validated.data.job_id}`);
   revalidatePath('/dashboard/applications');
   
+  // Notify the job owner that they have a new application
+  await createNotification(
+    job.customer_id,
+    NOTIFICATION_TYPES.APPLICATION_RECEIVED,
+    'New application received',
+    `A worker has applied to your job post.`,
+    `/dashboard/jobs/${validated.data.job_id}/applications`
+  );
+
   return { success: true };
 }
 
@@ -151,6 +162,15 @@ export async function reviewApplicationAction(applicationId: string, status: 're
   revalidatePath(`/dashboard/jobs/${application.job_post_id}/applications`);
   revalidatePath('/dashboard/applications');
 
+  // Notify the worker of rejection
+  await createNotification(
+    application.worker_id,
+    NOTIFICATION_TYPES.APPLICATION_REJECTED,
+    'Application not selected',
+    'Your application was not selected for this job.',
+    '/dashboard/applications'
+  );
+
   return { success: true };
 }
 
@@ -240,6 +260,15 @@ export async function acceptApplicationAction(
   revalidatePath(`/dashboard/jobs/${application.job_post_id}/applications`);
   revalidatePath('/dashboard/applications');
   revalidatePath('/dashboard/bookings');
+
+  // Notify the worker their application was accepted
+  await createNotification(
+    application.worker_id,
+    NOTIFICATION_TYPES.APPLICATION_ACCEPTED,
+    'Application accepted!',
+    'Your application has been accepted and a booking has been created.',
+    `/dashboard/bookings`
+  );
 
   return { success: true, bookingId: booking.id };
 }

@@ -8,6 +8,8 @@ import {
   bookingStatusUpdateSchema,
   BookingStatus,
 } from "@/lib/validations/bookings";
+import { createNotification } from "@/server/notifications/actions";
+import { NOTIFICATION_TYPES } from "@/lib/constants/notifications";
 
 // Allowed status transitions per role
 type AllowedTransitions = Partial<Record<BookingStatus, BookingStatus[]>>;
@@ -82,6 +84,16 @@ export async function createDirectBooking(data: DirectBookingInput) {
   }
 
   revalidatePath("/dashboard/bookings");
+
+  // Notify the worker they have a new booking request
+  await createNotification(
+    worker_id,
+    NOTIFICATION_TYPES.BOOKING_CREATED,
+    'New booking request',
+    'A customer has requested a booking with you.',
+    `/dashboard/bookings`
+  );
+
   return { success: true, bookingId: booking.id };
 }
 
@@ -223,5 +235,22 @@ export async function updateBookingStatus(bookingId: string, newStatus: BookingS
 
   revalidatePath(`/dashboard/bookings/${bookingId}`);
   revalidatePath("/dashboard/bookings");
+
+  // Notify the other party of the status change
+  const recipientId = isWorker ? booking.customer_id : booking.worker_id;
+  const statusLabel: Record<string, string> = {
+    accepted: 'accepted',
+    in_progress: 'in progress',
+    completed: 'completed',
+    cancelled: 'cancelled',
+  };
+  await createNotification(
+    recipientId,
+    NOTIFICATION_TYPES.BOOKING_UPDATED,
+    `Booking ${statusLabel[newStatus] ?? newStatus}`,
+    `Your booking status has been updated to "${statusLabel[newStatus] ?? newStatus}".`,
+    `/dashboard/bookings`
+  );
+
   return { success: true };
 }

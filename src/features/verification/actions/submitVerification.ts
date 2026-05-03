@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { verificationSchema } from "../schemas";
 import { revalidatePath } from "next/cache";
+import { createNotification } from "@/server/notifications/actions";
+import { NOTIFICATION_TYPES } from "@/lib/constants/notifications";
 
 export async function submitVerification(prevState: any, formData: FormData) {
   try {
@@ -94,10 +96,40 @@ export async function submitVerification(prevState: any, formData: FormData) {
 
     revalidatePath("/dashboard/verification");
     revalidatePath("/dashboard/discover");
+
+    // Notify the worker their docs have been received
+    await createNotification(
+      user.id,
+      NOTIFICATION_TYPES.VERIFICATION_RESULT,
+      'Verification documents submitted',
+      'Your verification documents have been received and are under review.',
+      '/dashboard/verification'
+    );
+
     return { success: true };
 
   } catch (error: any) {
     console.error("Verification submit error:", error);
     return { success: false, error: "An unexpected error occurred." };
   }
+}
+
+/**
+ * Called by admin flows when a verification request is approved or rejected.
+ * Sends an in-app notification to the affected worker.
+ */
+export async function notifyVerificationResult(
+  workerId: string,
+  approved: boolean,
+  adminNotes?: string
+) {
+  await createNotification(
+    workerId,
+    NOTIFICATION_TYPES.VERIFICATION_RESULT,
+    approved ? 'Verification approved! 🎉' : 'Verification not approved',
+    approved
+      ? 'Your identity has been verified. You now carry the Verified badge.'
+      : `Your verification was not approved.${adminNotes ? ` Reason: ${adminNotes}` : ' Please resubmit with updated documents.'}`,
+    '/dashboard/verification'
+  );
 }
