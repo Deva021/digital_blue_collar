@@ -22,7 +22,7 @@ export default async function AdminDashboardPage() {
       <div>
         <h1 className="text-2xl font-bold text-neutral-900">Dashboard Overview</h1>
         <p className="mt-1 text-sm text-neutral-500">
-          A high-level summary of platform activity. Read-only. Actions coming in Phase 20.
+          A high-level summary of platform activity.
         </p>
       </div>
 
@@ -67,7 +67,16 @@ export default async function AdminDashboardPage() {
           value={stats.pendingVerifications}
           description="Awaiting admin review"
           accent="rose"
-          icon={<ShieldAlert className="w-6 h-6" />}
+          icon={<ShieldAlert className={`w-6 h-6 ${stats.pendingVerifications > 0 ? 'animate-pulse text-rose-500' : ''}`} />}
+          className={stats.pendingVerifications > 0 ? 'ring-2 ring-rose-300 ring-offset-2' : ''}
+        />
+        <AdminStatCard
+          title="Inactive Categories"
+          value={stats.inactiveCategories}
+          description="Disabled service categories"
+          accent="amber"
+          icon={<Briefcase className="w-6 h-6" />}
+          className={stats.inactiveCategories > 0 ? 'bg-amber-50/50' : ''}
         />
       </div>
 

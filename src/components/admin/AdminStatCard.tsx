@@ -4,6 +4,7 @@ interface AdminStatCardProps {
   description?: string
   icon: React.ReactNode
   accent?: 'blue' | 'emerald' | 'amber' | 'rose' | 'violet'
+  className?: string
 }
 
 const accentMap: Record<NonNullable<AdminStatCardProps['accent']>, { bg: string; text: string; ring: string }> = {
@@ -20,11 +21,12 @@ export default function AdminStatCard({
   description,
   icon,
   accent = 'blue',
+  className = '',
 }: AdminStatCardProps) {
   const { bg, text, ring } = accentMap[accent]
 
   return (
-    <div className="relative bg-white border border-neutral-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+    <div className={`relative bg-white border border-neutral-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow overflow-hidden ${className}`}>
       {/* Subtle background decoration */}
       <div className="absolute top-0 right-0 w-24 h-24 -mr-6 -mt-6 opacity-5 rounded-full bg-current" style={{ color: 'currentColor' }} />
 
