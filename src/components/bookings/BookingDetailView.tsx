@@ -116,9 +116,10 @@ export function BookingDetailView({ booking }: { booking: any }) {
     ? `Service: ${booking.worker_services.service_categories.name}`
     : "Direct Service Booking";
 
-  const workerDescription = booking.worker_profiles?.bio
-    ? booking.worker_profiles.bio.slice(0, 100) + (booking.worker_profiles.bio.length > 100 ? "…" : "")
-    : "Worker";
+  const otherParty = isWorker ? booking.customer_profiles : booking.worker_profiles;
+  const showContactInfo = ["accepted", "in_progress", "completed"].includes(currentStatus);
+
+  const workerDescription = booking.worker_profiles?.full_name || "Unnamed Worker";
 
   const statusIcon: Record<BookingStatus, React.ReactNode> = {
     pending: <AlertCircle className="w-4 h-4 text-amber-600" />,
@@ -189,18 +190,18 @@ export function BookingDetailView({ booking }: { booking: any }) {
               day: "numeric",
             })}
           />
+          {isWorker && booking.customer_profiles && (
+            <DetailRow
+              icon={<User className="w-4 h-4" />}
+              label="Customer"
+              value={booking.customer_profiles.full_name || "Unnamed Customer"}
+            />
+          )}
           {!isWorker && booking.worker_profiles && (
             <DetailRow
               icon={<User className="w-4 h-4" />}
               label="Worker"
-              value={workerDescription}
-            />
-          )}
-          {isWorker && booking.worker_profiles?.location_text && (
-            <DetailRow
-              icon={<MapPin className="w-4 h-4" />}
-              label="Worker Location"
-              value={booking.worker_profiles.location_text}
+              value={booking.worker_profiles.full_name || "Unnamed Worker"}
             />
           )}
           {booking.job_posts?.description && (
@@ -210,6 +211,62 @@ export function BookingDetailView({ booking }: { booking: any }) {
               value={booking.job_posts.description}
             />
           )}
+        </div>
+      </Card>
+
+      {/* Contact Information Gated Section */}
+      <Card className="p-6 overflow-hidden">
+        <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+          <Clock className="w-4 h-4" />
+          Contact Information
+        </h3>
+        
+        {showContactInfo ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <p className="text-xs text-slate-400 uppercase tracking-wider font-medium">Full Name</p>
+                <p className="text-sm font-semibold text-slate-900">{otherParty?.full_name || "—"}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-slate-400 uppercase tracking-wider font-medium">Phone Number</p>
+                <p className="text-sm font-semibold text-blue-600">{otherParty?.contact_phone || "No phone listed"}</p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <p className="text-xs text-slate-400 uppercase tracking-wider font-medium">Service Address</p>
+                <p className="text-sm font-semibold text-slate-900">{otherParty?.contact_address || "No address listed"}</p>
+              </div>
+              {otherParty?.contact_notes && (
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-400 uppercase tracking-wider font-medium">Contact Notes</p>
+                  <p className="text-sm text-slate-600 italic">{otherParty.contact_notes}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-100 rounded-lg p-4 text-center">
+            <p className="text-sm text-slate-500">
+              Contact information will be shared once the booking is <span className="font-semibold text-blue-600">Accepted</span>.
+            </p>
+          </div>
+        )}
+      </Card>
+
+      {/* Messaging Placeholder */}
+      <Card className="p-6 border-dashed border-2 bg-slate-50/30">
+        <div className="flex flex-col items-center justify-center py-6 text-center space-y-3">
+          <div className="p-3 bg-white rounded-full shadow-sm text-slate-400">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div className="max-w-xs space-y-1">
+            <h4 className="font-bold text-slate-900">In-App Messaging</h4>
+            <p className="text-xs text-slate-500">
+              Direct messaging is coming soon. Please use the contact details shared above to coordinate after booking confirmation.
+            </p>
+          </div>
         </div>
       </Card>
 
