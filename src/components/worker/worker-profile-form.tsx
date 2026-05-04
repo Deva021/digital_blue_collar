@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, UploadCloud } from "lucide-react";
 
 import { workerProfileSchema, type WorkerProfileValues } from "@/lib/validations/worker";
-import { upsertWorkerProfile } from "@/app/worker/actions";
+import { updateWorkerProfile } from "@/server/actions/profiles";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,8 +18,12 @@ import { Select } from "@/components/ui/select";
 
 interface WorkerProfileFormProps {
   initialData: {
+    full_name?: string | null;
     bio?: string | null;
     location_text?: string | null;
+    contact_phone?: string | null;
+    contact_address?: string | null;
+    contact_notes?: string | null;
     can_travel?: boolean | null;
     has_tools?: boolean | null;
     availability_status?: string | null;
@@ -39,8 +43,12 @@ export function WorkerProfileForm({ initialData }: WorkerProfileFormProps) {
   } = useForm({
     resolver: zodResolver(workerProfileSchema),
     defaultValues: {
+      full_name: initialData.full_name || "",
       bio: initialData.bio || "",
       location_text: initialData.location_text || "",
+      contact_phone: initialData.contact_phone || "",
+      contact_address: initialData.contact_address || "",
+      contact_notes: initialData.contact_notes || "",
       can_travel: initialData.can_travel || false,
       has_tools: initialData.has_tools || false,
       availability_status: (initialData.availability_status as any) || "available",
@@ -49,7 +57,7 @@ export function WorkerProfileForm({ initialData }: WorkerProfileFormProps) {
 
   const onSubmit = (data: any) => {
     startTransition(async () => {
-      const response = await upsertWorkerProfile(data as WorkerProfileValues);
+      const response = await updateWorkerProfile(data as WorkerProfileValues);
       if (!response.success) {
         if (response.errors) {
           for (const [key, value] of Object.entries(response.errors)) {
@@ -103,6 +111,18 @@ export function WorkerProfileForm({ initialData }: WorkerProfileFormProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="full_name">Full Name (Marketplace Identity)</Label>
+              <Input 
+                id="full_name"
+                placeholder="e.g. Abebe Bikila"
+                {...register("full_name")}
+                disabled={pending}
+              />
+              {errors.full_name && <p className="text-sm text-red-500">{errors.full_name.message}</p>}
+              <p className="text-xs text-slate-400 italic">This name will be visible to all users on the platform.</p>
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
               <Label htmlFor="bio">Professional Bio</Label>
               <Textarea 
                 id="bio"
@@ -133,6 +153,44 @@ export function WorkerProfileForm({ initialData }: WorkerProfileFormProps) {
                 <option value="offline">Offline / Paused</option>
               </Select>
               {errors.availability_status && <p className="text-sm text-red-500">{errors.availability_status.message}</p>}
+            </div>
+
+            <div className="space-y-2 md:col-span-2 pt-4">
+              <h4 className="text-sm font-semibold text-slate-900 border-b border-slate-100 pb-2">Private Contact Information</h4>
+              <p className="text-xs text-slate-500 mb-4">This information is only shared with customers AFTER they have a confirmed booking with you.</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="contact_phone">Contact Phone</Label>
+              <Input 
+                id="contact_phone"
+                placeholder="e.g. +251 911..."
+                {...register("contact_phone")}
+                disabled={pending}
+              />
+              {errors.contact_phone && <p className="text-sm text-red-500">{errors.contact_phone.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="contact_address">Physical Address</Label>
+              <Input 
+                id="contact_address"
+                placeholder="e.g. Bole, House #123"
+                {...register("contact_address")}
+                disabled={pending}
+              />
+              {errors.contact_address && <p className="text-sm text-red-500">{errors.contact_address.message}</p>}
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="contact_notes">Contact Notes</Label>
+              <Textarea 
+                id="contact_notes"
+                placeholder="Any additional info on how to reach you..."
+                {...register("contact_notes")}
+                disabled={pending}
+              />
+              {errors.contact_notes && <p className="text-sm text-red-500">{errors.contact_notes.message}</p>}
             </div>
           </div>
 

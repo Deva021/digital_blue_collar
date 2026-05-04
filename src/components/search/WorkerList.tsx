@@ -42,7 +42,7 @@ export function WorkerList({
               <CardHeader className="pb-3 border-b border-gray-100">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2">
-                    <CardTitle className="text-lg">{worker.full_name || 'Professional Worker'}</CardTitle>
+                    <CardTitle className="text-lg">{worker.full_name || 'Unnamed Worker'}</CardTitle>
                     {worker.verification_status === 'verified' && <VerifiedBadge />}
                   </div>
                   {worker.availability_status === 'available' && (

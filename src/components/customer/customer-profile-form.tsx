@@ -7,7 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 
 import { customerProfileSchema, type CustomerProfileValues } from "@/lib/validations/customer";
-import { upsertCustomerProfile } from "@/app/customer/actions";
+import { updateCustomerProfile } from "@/server/actions/profiles";
+import { Textarea } from "@/components/ui/textarea";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,7 +17,11 @@ import { Button } from "@/components/ui/button";
 
 interface CustomerProfileFormProps {
   initialData?: {
+    full_name?: string | null;
     location_text?: string | null;
+    contact_phone?: string | null;
+    contact_address?: string | null;
+    contact_notes?: string | null;
   };
 }
 
@@ -33,13 +38,17 @@ export function CustomerProfileForm({ initialData }: CustomerProfileFormProps) {
   } = useForm({
     resolver: zodResolver(customerProfileSchema),
     defaultValues: {
+      full_name: initialData?.full_name || "",
       location_text: initialData?.location_text || "",
+      contact_phone: initialData?.contact_phone || "",
+      contact_address: initialData?.contact_address || "",
+      contact_notes: initialData?.contact_notes || "",
     },
   });
 
   const onSubmit = (data: any) => {
     startTransition(async () => {
-      const response = await upsertCustomerProfile(data as CustomerProfileValues);
+      const response = await updateCustomerProfile(data as CustomerProfileValues);
       if (!response.success) {
         if (response.errors) {
           for (const [key, value] of Object.entries(response.errors)) {
@@ -87,6 +96,17 @@ export function CustomerProfileForm({ initialData }: CustomerProfileFormProps) {
 
           <div className="space-y-4">
             <div className="space-y-2">
+              <Label htmlFor="full_name">Full Name</Label>
+              <Input 
+                id="full_name"
+                placeholder="e.g. Martha Tilahun"
+                {...register("full_name")}
+                disabled={pending}
+              />
+              {errors.full_name && <p className="text-sm text-red-500">{errors.full_name.message}</p>}
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="location_text">Default Location (e.g., Neighborhood, City)</Label>
               <Input 
                 id="location_text"
@@ -97,6 +117,44 @@ export function CustomerProfileForm({ initialData }: CustomerProfileFormProps) {
               {errors.location_text && (
                   <p className="text-sm font-medium text-red-500">{errors.location_text.message}</p>
               )}
+            </div>
+
+            <div className="space-y-2 pt-4">
+              <h4 className="text-sm font-semibold text-slate-900 border-b border-slate-100 pb-2">Private Contact Information</h4>
+              <p className="text-xs text-slate-500 mb-4">This info is only shared with workers AFTER you have a confirmed booking with them.</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="contact_phone">Contact Phone</Label>
+              <Input 
+                id="contact_phone"
+                placeholder="e.g. +251 911..."
+                {...register("contact_phone")}
+                disabled={pending}
+              />
+              {errors.contact_phone && <p className="text-sm text-red-500">{errors.contact_phone.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="contact_address">Physical Address (for service delivery)</Label>
+              <Input 
+                id="contact_address"
+                placeholder="e.g. Bole, House #456"
+                {...register("contact_address")}
+                disabled={pending}
+              />
+              {errors.contact_address && <p className="text-sm text-red-500">{errors.contact_address.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="contact_notes">Contact Notes</Label>
+              <Textarea 
+                id="contact_notes"
+                placeholder="Any special instructions for reaching you..."
+                {...register("contact_notes")}
+                disabled={pending}
+              />
+              {errors.contact_notes && <p className="text-sm text-red-500">{errors.contact_notes.message}</p>}
             </div>
           </div>
         </CardContent>

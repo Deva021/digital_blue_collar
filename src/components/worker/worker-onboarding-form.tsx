@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 
 import { workerProfileSchema, type WorkerProfileValues } from "@/lib/validations/worker";
-import { upsertWorkerProfile } from "@/app/worker/actions";
+import { updateWorkerProfile } from "@/server/actions/profiles";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,8 +27,12 @@ export function WorkerOnboardingForm() {
   } = useForm({
     resolver: zodResolver(workerProfileSchema),
     defaultValues: {
+      full_name: "",
       bio: "",
       location_text: "",
+      contact_phone: "",
+      contact_address: "",
+      contact_notes: "",
       can_travel: false,
       has_tools: false,
       availability_status: "available",
@@ -37,7 +41,7 @@ export function WorkerOnboardingForm() {
 
   const onSubmit = (data: any) => {
     startTransition(async () => {
-      const response = await upsertWorkerProfile(data as WorkerProfileValues);
+      const response = await updateWorkerProfile(data as WorkerProfileValues);
       if (!response.success) {
         if (response.errors) {
           // Flatten field errors into form state
@@ -48,8 +52,8 @@ export function WorkerOnboardingForm() {
           setError("root", { type: "server", message: response.message });
         }
       } else {
-        // Success redirect - immediately send them to fill out categories
-        router.push("/worker/settings/profile");
+        // Success redirect - immediately send them to the unified profile area
+        router.push("/dashboard/profile");
       }
     });
   };
@@ -73,6 +77,17 @@ export function WorkerOnboardingForm() {
           )}
 
           <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="full_name">Full Name</Label>
+              <Input 
+                id="full_name"
+                placeholder="e.g. Dawit Lema"
+                {...register("full_name")}
+                disabled={pending}
+              />
+              {errors.full_name && <p className="text-sm text-red-500">{errors.full_name.message}</p>}
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="bio">Professional Bio</Label>
               <Textarea 
