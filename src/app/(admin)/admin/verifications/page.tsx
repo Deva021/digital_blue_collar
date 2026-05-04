@@ -1,6 +1,5 @@
-import { getAdminVerifications, type AdminVerification } from '@/lib/services/admin'
-import AdminDataTable from '@/components/admin/AdminDataTable'
-import { Badge } from '@/components/ui/badge'
+import { getAdminVerifications } from '@/lib/services/admin'
+import AdminVerificationsTable from '@/components/admin/AdminVerificationsTable'
 
 export const metadata = {
   title: 'Verification Queue — Admin Dashboard',
@@ -8,41 +7,6 @@ export const metadata = {
 
 export default async function AdminVerificationsPage() {
   const verifications = await getAdminVerifications()
-
-  const columns = [
-    { key: 'worker_id', header: 'Worker ID' },
-    {
-      key: 'status',
-      header: 'Status',
-      render: (row: AdminVerification) => {
-        const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-          pending: 'secondary',
-          verified: 'default',
-          rejected: 'destructive',
-        }
-        return <Badge variant={variants[row.status] || 'outline'}>{row.status}</Badge>
-      },
-    },
-    {
-      key: 'document_url',
-      header: 'Document',
-      render: (row: AdminVerification) => (
-        <a
-          href={row.document_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:underline"
-        >
-          View Document
-        </a>
-      ),
-    },
-    {
-      key: 'created_at',
-      header: 'Submitted',
-      render: (row: AdminVerification) => new Date(row.created_at).toLocaleDateString(),
-    },
-  ]
 
   return (
     <div className="space-y-6">
@@ -53,12 +17,7 @@ export default async function AdminVerificationsPage() {
         </p>
       </div>
 
-      <AdminDataTable
-        data={verifications}
-        columns={columns}
-        emptyMessage="Queue is empty"
-        emptyDescription="There are no pending verification requests to review."
-      />
+      <AdminVerificationsTable verifications={verifications} />
     </div>
   )
 }

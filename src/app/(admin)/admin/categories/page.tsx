@@ -1,6 +1,5 @@
-import { getAdminCategories, type AdminCategory } from '@/lib/services/admin'
-import AdminDataTable from '@/components/admin/AdminDataTable'
-import { Badge } from '@/components/ui/badge'
+import { getAdminCategories } from '@/lib/services/admin'
+import AdminCategoriesTable from '@/components/admin/AdminCategoriesTable'
 
 export const metadata = {
   title: 'Categories Management — Admin Dashboard',
@@ -8,25 +7,6 @@ export const metadata = {
 
 export default async function AdminCategoriesPage() {
   const categories = await getAdminCategories()
-
-  const columns = [
-    { key: 'name', header: 'Name' },
-    {
-      key: 'is_active',
-      header: 'Status',
-      render: (row: AdminCategory) => (
-        <Badge variant={row.is_active ? 'default' : 'secondary'}>
-          {row.is_active ? 'Active' : 'Inactive'}
-        </Badge>
-      ),
-    },
-    { key: 'description', header: 'Description' },
-    {
-      key: 'created_at',
-      header: 'Created',
-      render: (row: AdminCategory) => new Date(row.created_at).toLocaleDateString(),
-    },
-  ]
 
   return (
     <div className="space-y-6">
@@ -37,12 +17,7 @@ export default async function AdminCategoriesPage() {
         </p>
       </div>
 
-      <AdminDataTable
-        data={categories}
-        columns={columns}
-        emptyMessage="No categories"
-        emptyDescription="System service categories haven't been configured."
-      />
+      <AdminCategoriesTable categories={categories} />
     </div>
   )
 }

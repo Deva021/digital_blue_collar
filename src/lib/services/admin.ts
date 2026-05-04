@@ -1,7 +1,9 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/service'
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 
 // ─── Guard helper ──────────────────────────────────────────────────────────────
 // Every exported function calls this to ensure the caller is an admin.
@@ -33,12 +35,13 @@ export interface AdminOverviewStats {
   totalJobs: number
   totalBookings: number
   pendingVerifications: number
+  inactiveCategories: number
 }
 
 export async function getAdminOverviewStats(): Promise<AdminOverviewStats> {
   const supabase = await requireAdmin()
 
-  const [users, workers, customers, jobs, bookings, verifications] =
+  const [users, workers, customers, jobs, bookings, verifications, inactiveCategories] =
     await Promise.all([
       supabase.from('users').select('*', { count: 'exact', head: true }),
       supabase.from('worker_profiles').select('*', { count: 'exact', head: true }),
@@ -49,6 +52,10 @@ export async function getAdminOverviewStats(): Promise<AdminOverviewStats> {
         .from('verification_requests')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending'),
+      supabase
+        .from('service_categories')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', false),
     ])
 
   return {
@@ -58,6 +65,7 @@ export async function getAdminOverviewStats(): Promise<AdminOverviewStats> {
     totalJobs: jobs.count ?? 0,
     totalBookings: bookings.count ?? 0,
     pendingVerifications: verifications.count ?? 0,
+    inactiveCategories: inactiveCategories.count ?? 0,
   }
 }
 
@@ -132,6 +140,31 @@ export async function getAdminCategories(): Promise<AdminCategory[]> {
   }
 
   return data ?? []
+}
+
+export async function toggleCategoryActive(categoryId: string, isActive: boolean) {
+  await requireAdmin()
+
+  if (!categoryId) {
+    return { success: false, error: 'Category ID is required' }
+  }
+
+  const supabase = createServiceRoleClient()
+  
+  const { error } = await supabase
+    .from('service_categories')
+    .update({ is_active: isActive })
+    .eq('id', categoryId)
+
+  if (error) {
+    console.error('toggleCategoryActive error:', error)
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath('/admin/categories')
+  revalidatePath('/categories')
+  
+  return { success: true }
 }
 
 // ─── Jobs ──────────────────────────────────────────────────────────────────────
@@ -238,5 +271,85 @@ export async function getAdminVerifications(): Promise<AdminVerification[]> {
     return []
   }
 
-  return data ?? []
+  // Sort: pending first, then by date descending
+  const sortedData = [...(data || [])].sort((a, b) => {
+    if (a.status === 'pending' && b.status !== 'pending') return -1
+    if (a.status !== 'pending' && b.status === 'pending') return 1
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  })
+
+  return sortedData
+}
+
+export async function reviewVerification(
+  verificationId: string,
+  decision: 'verified' | 'rejected',
+  adminNotes: string
+) {
+  await requireAdmin()
+
+  if (!verificationId) {
+    return { success: false, error: 'Verification ID is required' }
+  }
+
+  if (!adminNotes || adminNotes.trim().length === 0) {
+    return { success: false, error: 'Admin notes are required for this action' }
+  }
+
+  const supabase = createServiceRoleClient()
+
+  // 1. Verify it's still pending
+  const { data: existing, error: fetchError } = await supabase
+    .from('verification_requests')
+    .select('status')
+    .eq('id', verificationId)
+    .single()
+
+  if (fetchError || !existing) {
+    return { success: false, error: 'Verification request not found' }
+  }
+
+  if (existing.status !== 'pending') {
+    return { success: false, error: 'This request has already been reviewed' }
+  }
+
+  // 2. Perform the update
+  const { error: updateError } = await supabase
+    .from('verification_requests')
+    .update({
+      status: decision,
+      admin_notes: adminNotes.trim(),
+    })
+    .eq('id', verificationId)
+
+  if (updateError) {
+    console.error('reviewVerification update error:', updateError)
+    return { success: false, error: updateError.message }
+  }
+
+  revalidatePath('/admin/verifications')
+  revalidatePath('/admin')
+  
+  return { success: true }
+}
+
+export async function getAdminVerificationDetail(verificationId: string) {
+  await requireAdmin()
+
+  if (!verificationId) return null
+
+  const supabase = createServiceRoleClient()
+
+  const { data, error } = await supabase
+    .from('verification_requests')
+    .select('*')
+    .eq('id', verificationId)
+    .single()
+
+  if (error || !data) {
+    console.error('getAdminVerificationDetail error:', error)
+    return null
+  }
+
+  return data
 }
