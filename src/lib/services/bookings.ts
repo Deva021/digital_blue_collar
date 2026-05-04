@@ -110,11 +110,13 @@ export async function getUserBookings() {
       *,
       worker_profiles (
         id,
+        full_name,
         bio,
         location_text
       ),
       customer_profiles (
         id,
+        full_name,
         location_text
       ),
       worker_services (
@@ -151,12 +153,20 @@ export async function getBookingById(bookingId: string) {
       *,
       worker_profiles (
         id,
+        full_name,
         bio,
-        location_text
+        location_text,
+        contact_phone,
+        contact_address,
+        contact_notes
       ),
       customer_profiles (
         id,
-        location_text
+        full_name,
+        location_text,
+        contact_phone,
+        contact_address,
+        contact_notes
       ),
       worker_services (
         id,
