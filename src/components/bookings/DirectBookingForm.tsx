@@ -8,20 +8,28 @@ import { Calendar, MapPin, DollarSign } from "lucide-react";
 
 type Props = {
   workerId: string;
+  workerName?: string;
   workerServiceId?: string;
   serviceLabel?: string;
   basePrice?: number | null;
+  availableServices?: any[];
 };
 
 export function DirectBookingForm({
   workerId,
-  workerServiceId,
+  workerName,
+  workerServiceId: initialWorkerServiceId,
   serviceLabel,
-  basePrice,
+  basePrice: initialBasePrice,
+  availableServices = [],
 }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [workerServiceId, setWorkerServiceId] = useState(initialWorkerServiceId);
+  const [selectedService, setSelectedService] = useState<any>(
+    availableServices.find(s => s.id === initialWorkerServiceId) || null
+  );
 
   const minDateTime = new Date(Date.now() + 5 * 60 * 1000)
     .toISOString()
@@ -55,10 +63,33 @@ export function DirectBookingForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {serviceLabel && (
+      {workerServiceId ? (
         <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-800">
           <span className="font-semibold">Booking service: </span>
-          {serviceLabel}
+          {serviceLabel || selectedService?.service_categories?.name || "Selected Service"}
+        </div>
+      ) : (
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-slate-700">
+            Select Service <span className="text-red-500">*</span>
+          </label>
+          <select 
+            name="worker_service_id" 
+            required 
+            className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+            onChange={(e) => {
+              const sId = e.target.value;
+              setWorkerServiceId(sId);
+              setSelectedService(availableServices.find(s => s.id === sId));
+            }}
+          >
+            <option value="">-- Choose a service --</option>
+            {availableServices.map(s => (
+              <option key={s.id} value={s.id}>
+                {s.service_categories?.name} {s.base_price ? `(ETB ${s.base_price})` : ''}
+              </option>
+            ))}
+          </select>
         </div>
       )}
 
@@ -124,14 +155,15 @@ export function DirectBookingForm({
           type="number"
           min="1"
           step="0.01"
-          defaultValue={basePrice ?? undefined}
-          placeholder={basePrice ? String(basePrice) : "e.g. 500"}
+          key={selectedService?.id || 'no-service'}
+          defaultValue={selectedService?.base_price || initialBasePrice || ""}
+          placeholder={selectedService?.base_price ? String(selectedService.base_price) : "e.g. 500"}
           required
           className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
         />
-        {basePrice != null && (
+        {(selectedService?.base_price || initialBasePrice) && (
           <p className="text-xs text-slate-400">
-            Base price: {Number(basePrice).toLocaleString()} ETB
+            Base price: {Number(selectedService?.base_price || initialBasePrice).toLocaleString()} ETB
           </p>
         )}
       </div>

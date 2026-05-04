@@ -20,6 +20,7 @@ export async function getPublicWorkers(filters: SearchFilters) {
     .from("worker_profiles")
     .select(`
       id,
+      full_name,
       bio,
       location_text,
       availability_status,
@@ -145,4 +146,30 @@ export async function searchJobs(filters: SearchFilters) {
   }
 
   return { data, count: count || 0, error: null };
+}
+
+export async function getPublicWorkerById(id: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("worker_profiles")
+    .select(`
+      id,
+      full_name,
+      bio,
+      location_text,
+      availability_status,
+      verification_status,
+      created_at,
+      worker_categories ( category_id, service_categories(name) ),
+      worker_services ( id, base_price, is_negotiable, description, service_categories(name) )
+    `)
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error("Error fetching worker profile:", error);
+    return null;
+  }
+
+  return data;
 }

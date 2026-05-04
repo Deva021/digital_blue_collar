@@ -56,7 +56,7 @@ export default async function NewBookingPage(props: {
               <User className="w-6 h-6 text-slate-400" />
             </div>
             <div>
-              <h2 className="font-semibold text-slate-900">Professional Worker</h2>
+              <h2 className="font-semibold text-slate-900">{worker.full_name || 'Unnamed Worker'}</h2>
               <p className="text-sm text-slate-600 line-clamp-2">{worker.bio || "No bio provided"}</p>
               {worker.location_text && (
                 <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
@@ -69,9 +69,11 @@ export default async function NewBookingPage(props: {
 
           <DirectBookingForm
             workerId={worker_id}
+            workerName={worker.full_name}
             workerServiceId={service_id}
             serviceLabel={service?.service_categories?.name}
             basePrice={service?.base_price}
+            availableServices={worker.worker_services || []}
           />
         </div>
       </div>

@@ -110,7 +110,7 @@ export default async function UnifiedDashboardPage() {
 
       <div className="pt-8 border-t border-slate-100">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-6">Quick Links</h3>
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link href="/dashboard/discover" className="flex-1">
             <Button variant="primary" className="w-full h-12 shadow-sm text-base">
               <ArrowRight className="mr-2 h-4 w-4" />
@@ -145,6 +145,18 @@ export default async function UnifiedDashboardPage() {
             <Button variant="outline" className="w-full h-12 border-slate-200 shadow-sm text-slate-700 bg-white hover:bg-slate-50 text-base">
               <Bell className="mr-2 h-4 w-4 text-rose-500" />
               Notifications
+            </Button>
+          </Link>
+          <Link href="/dashboard/profile" className="flex-1">
+            <Button variant="outline" className="w-full h-12 border-slate-200 shadow-sm text-slate-700 bg-white hover:bg-slate-50 text-base">
+              <UserCircle className="mr-2 h-4 w-4 text-slate-500" />
+              Manage Profile
+            </Button>
+          </Link>
+          <Link href="/dashboard/verification" className="flex-1">
+            <Button variant="outline" className="w-full h-12 border-slate-200 shadow-sm text-slate-700 bg-white hover:bg-slate-50 text-base">
+              <UserCircle className="mr-2 h-4 w-4 text-emerald-500" />
+              Verification
             </Button>
           </Link>
         </div>
