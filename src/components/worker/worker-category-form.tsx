@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { CategoryWithChildren } from "@/lib/services/categories";
 import { upsertWorkerCategories } from "@/app/worker/category-actions";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils/cn";
 
 interface WorkerCategoryFormProps {
   categories: CategoryWithChildren[];
@@ -54,35 +55,45 @@ export function WorkerCategoryForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
         {categories.map((parent) => (
-          <div key={parent.id} className="p-4 border rounded-lg bg-card">
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id={`cat-${parent.id}`}
-                checked={selectedIds.has(parent.id)}
-                onChange={() => toggleCategory(parent.id, null)}
-                className="h-4 w-4 rounded border-muted-300 text-primary-600 focus:ring-primary-500"
-              />
-              <label htmlFor={`cat-${parent.id}`} className="font-medium">
-                {parent.name}
-              </label>
+          <div key={parent.id} className={cn(
+            "p-5 border rounded-2xl bg-white shadow-sm hover:border-slate-300 transition-colors focus-within:ring-4 focus-within:ring-primary-500/20 focus-within:border-primary-500",
+            selectedIds.has(parent.id) ? "border-primary-500 bg-primary-50/20" : "border-slate-200"
+          )}>
+            <div className="flex items-start space-x-3">
+              <div className="flex h-5 items-center mt-0.5">
+                <input
+                  type="checkbox"
+                  id={`cat-${parent.id}`}
+                  checked={selectedIds.has(parent.id)}
+                  onChange={() => toggleCategory(parent.id, null)}
+                  className="h-5 w-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer transition-all"
+                />
+              </div>
+              <div>
+                <label htmlFor={`cat-${parent.id}`} className="text-base font-semibold text-slate-900 cursor-pointer">
+                  {parent.name}
+                </label>
+                {parent.description && (
+                  <p className="text-sm text-slate-500 mt-1">{parent.description}</p>
+                )}
+              </div>
             </div>
-            {parent.description && (
-              <p className="text-sm text-muted-500 mt-1 pl-6">{parent.description}</p>
-            )}
 
             {parent.children.length > 0 && (
-              <div className="mt-3 ml-6 space-y-2 border-t border-muted-100 pt-3">
+              <div className="mt-4 ml-8 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-slate-100 pt-4">
                 {parent.children.map((child) => (
-                  <div key={child.id} className="flex items-center space-x-2">
+                  <div key={child.id} className={cn(
+                    "flex items-center space-x-2 p-2 rounded-lg transition-colors cursor-pointer border border-transparent",
+                    selectedIds.has(child.id) ? "bg-primary-50 border-primary-100" : "hover:bg-slate-50"
+                  )}>
                     <input
                       type="checkbox"
                       id={`cat-${child.id}`}
                       checked={selectedIds.has(child.id)}
                       onChange={() => toggleCategory(child.id, parent.id)}
-                      className="h-4 w-4 rounded border-muted-300 text-primary-600 focus:ring-primary-500"
+                      className="h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
                     />
-                    <label htmlFor={`cat-${child.id}`} className="text-sm cursor-pointer">
+                    <label htmlFor={`cat-${child.id}`} className="text-sm font-medium text-slate-700 cursor-pointer flex-1">
                       {child.name}
                     </label>
                   </div>

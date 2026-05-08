@@ -9,6 +9,10 @@ import { CategoryWithChildren } from "@/lib/services/categories";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { CheckboxCard } from "@/components/ui/checkbox-card";
+import { Info } from "lucide-react";
 
 interface WorkerServiceFormProps {
   categories: CategoryWithChildren[];
@@ -66,17 +70,25 @@ export function WorkerServiceForm({ categories, initialData, onSuccess }: Worker
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl bg-white p-6 sm:p-8 rounded-xl border border-slate-200 shadow-sm">
-      {globalError && (
-        <div className="p-4 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">
-          {globalError}
-        </div>
-      )}
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle>{initialData?.id ? "Update Service" : "Create Service"}</CardTitle>
+        <CardDescription>
+          Define your service offering and set your pricing options.
+        </CardDescription>
+      </CardHeader>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <CardContent className="space-y-6">
+          {globalError && (
+            <div className="p-4 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">
+              {globalError}
+            </div>
+          )}
 
-      <div className="space-y-6">
-        <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500 border-b pb-2">Service Details</h4>
+          <div className="space-y-6">
+            <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500 border-b pb-2">Service Details</h4>
 
-        {/* Service Title */}
+            {/* Service Title */}
         <div className="space-y-2">
         <label htmlFor="title" className="text-sm font-semibold text-slate-900">
           Service Title
@@ -95,10 +107,10 @@ export function WorkerServiceForm({ categories, initialData, onSuccess }: Worker
         <label htmlFor="category_id" className="text-sm font-semibold text-slate-900">
           Category
         </label>
-        <select
+        <Select
           id="category_id"
           {...register("category_id")}
-          className={`flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${errors.category_id ? "border-red-500" : "border-input"}`}
+          disabled={isPending}
         >
           <option value="" disabled>Select a category...</option>
           {categories.map((parent) => (
@@ -111,7 +123,7 @@ export function WorkerServiceForm({ categories, initialData, onSuccess }: Worker
               ))}
             </optgroup>
           ))}
-        </select>
+        </Select>
         {errors.category_id && <p className="text-xs text-red-500">{errors.category_id.message}</p>}
       </div>
 
@@ -132,20 +144,15 @@ export function WorkerServiceForm({ categories, initialData, onSuccess }: Worker
       </div>
 
       {/* Pricing Section */}
-      <div className="space-y-4 pt-4 border-t border-slate-100">
-        <h3 className="text-sm font-semibold text-slate-900">Pricing Details</h3>
+      <div className="mt-6 p-5 bg-slate-50 border border-slate-100 rounded-xl space-y-6">
+        <h3 className="text-sm font-semibold text-slate-900 border-b border-slate-200/50 pb-2">Pricing Details</h3>
         
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="is_negotiable"
-            {...register("is_negotiable")}
-            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-          />
-          <label htmlFor="is_negotiable" className="text-sm font-medium text-slate-700">
-            Price is negotiable (or quote based)
-          </label>
-        </div>
+        <CheckboxCard
+          label="Price is negotiable (or quote based)"
+          description="Allow customers to request custom quotes based on their specific needs"
+          {...register("is_negotiable")}
+          disabled={isPending}
+        />
 
         {!isNegotiable && (
           <div className="space-y-2 pl-6 animate-in slide-in-from-top-2 fade-in duration-200">
@@ -169,24 +176,23 @@ export function WorkerServiceForm({ categories, initialData, onSuccess }: Worker
         )}
       </div>
 
-      {/* Active Toggle & Submit */}
-      <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="is_active"
-            {...register("is_active")}
-            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-          />
-          <label htmlFor="is_active" className="text-sm font-medium text-slate-700">
-            Make this service active immediately
-          </label>
-        </div>
+      <div className="mt-6 space-y-4">
+        <CheckboxCard
+          label="Make this service active immediately"
+          description="Active services are visible to customers in search results"
+          {...register("is_active")}
+          disabled={isPending}
+        />
+      </div>
+      </CardContent>
 
-        <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
+      {/* Active Toggle & Submit */}
+      <CardFooter className="pt-6 border-t border-slate-100 bg-slate-50/50 rounded-b-xl flex justify-end">
+        <Button type="submit" disabled={isPending} className="w-full sm:w-auto px-8">
           {isPending ? "Saving..." : (initialData?.id ? "Update Service" : "Create Service")}
         </Button>
-      </div>
-    </form>
+      </CardFooter>
+      </form>
+    </Card>
   );
 }

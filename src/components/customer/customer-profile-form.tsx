@@ -4,7 +4,7 @@ import { useTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, Lock } from "lucide-react";
 
 import { customerProfileSchema, type CustomerProfileValues } from "@/lib/validations/customer";
 import { updateCustomerProfile } from "@/server/actions/profiles";
@@ -119,42 +119,49 @@ export function CustomerProfileForm({ initialData }: CustomerProfileFormProps) {
               )}
             </div>
 
-            <div className="space-y-2 pt-4">
-              <h4 className="text-sm font-semibold text-slate-900 border-b border-slate-100 pb-2">Private Contact Information</h4>
-              <p className="text-xs text-slate-500 mb-4">This info is only shared with workers AFTER you have a confirmed booking with them.</p>
-            </div>
+            <div className="mt-4 p-5 bg-amber-50/50 border border-amber-100 rounded-xl space-y-6">
+              <div className="space-y-1 border-b border-amber-200/50 pb-3">
+                <h4 className="flex items-center gap-2 text-sm font-semibold text-amber-900">
+                  <Lock className="w-4 h-4" />
+                  Private Contact Information
+                </h4>
+                <p className="text-xs text-amber-700">This info is only shared with workers AFTER you have a confirmed booking with them.</p>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="contact_phone">Contact Phone</Label>
-              <Input 
-                id="contact_phone"
-                placeholder="e.g. +251 911..."
-                {...register("contact_phone")}
-                disabled={pending}
-              />
-              {errors.contact_phone && <p className="text-sm text-red-500">{errors.contact_phone.message}</p>}
-            </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="contact_phone">Contact Phone</Label>
+                  <Input 
+                    id="contact_phone"
+                    placeholder="e.g. +251 911..."
+                    {...register("contact_phone")}
+                    disabled={pending}
+                  />
+                  {errors.contact_phone && <p className="text-sm text-red-500">{errors.contact_phone.message}</p>}
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="contact_address">Physical Address (for service delivery)</Label>
-              <Input 
-                id="contact_address"
-                placeholder="e.g. Bole, House #456"
-                {...register("contact_address")}
-                disabled={pending}
-              />
-              {errors.contact_address && <p className="text-sm text-red-500">{errors.contact_address.message}</p>}
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="contact_address">Physical Address (for service delivery)</Label>
+                  <Input 
+                    id="contact_address"
+                    placeholder="e.g. Bole, House #456"
+                    {...register("contact_address")}
+                    disabled={pending}
+                  />
+                  {errors.contact_address && <p className="text-sm text-red-500">{errors.contact_address.message}</p>}
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="contact_notes">Contact Notes</Label>
-              <Textarea 
-                id="contact_notes"
-                placeholder="Any special instructions for reaching you..."
-                {...register("contact_notes")}
-                disabled={pending}
-              />
-              {errors.contact_notes && <p className="text-sm text-red-500">{errors.contact_notes.message}</p>}
+                <div className="space-y-2">
+                  <Label htmlFor="contact_notes">Contact Notes</Label>
+                  <Textarea 
+                    id="contact_notes"
+                    placeholder="Any special instructions for reaching you..."
+                    {...register("contact_notes")}
+                    disabled={pending}
+                  />
+                  {errors.contact_notes && <p className="text-sm text-red-500">{errors.contact_notes.message}</p>}
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>

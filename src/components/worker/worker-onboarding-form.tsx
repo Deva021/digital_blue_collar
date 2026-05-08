@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
 
 import { workerProfileSchema, type WorkerProfileValues } from "@/lib/validations/worker";
 import { updateWorkerProfile } from "@/server/actions/profiles";
@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { CheckboxCard } from "@/components/ui/checkbox-card";
 
 export function WorkerOnboardingForm() {
   const router = useRouter();
@@ -90,6 +91,12 @@ export function WorkerOnboardingForm() {
 
             <div className="space-y-2">
               <Label htmlFor="bio">Professional Bio</Label>
+              <div className="flex items-start gap-3 p-3 bg-blue-50 text-blue-800 rounded-lg border border-blue-100 mb-2">
+                <Info className="w-5 h-5 shrink-0 mt-0.5 text-blue-600" />
+                <p className="text-sm">
+                  <strong>Tip:</strong> A detailed bio significantly increases your chances of getting hired. Highlight your experience and skills!
+                </p>
+              </div>
               <Textarea 
                 id="bio"
                 placeholder="I am an experienced professional doing..."
@@ -113,26 +120,19 @@ export function WorkerOnboardingForm() {
             
             <div className="space-y-4 pt-4 border-t border-slate-100">
               <h4 className="text-sm font-medium text-slate-900">Work Logistics</h4>
-              <div className="flex items-center space-x-2">
-                <input 
-                  type="checkbox" 
-                  id="can_travel" 
-                  className="rounded border-slate-300 text-blue-600 shadow-sm focus:ring-blue-500"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CheckboxCard
+                  label="I am able to travel to customer locations"
+                  description="Check this if you provide mobile services"
                   {...register("can_travel")}
                   disabled={pending}
                 />
-                <Label htmlFor="can_travel" className="font-normal cursor-pointer">I am able to travel to customer locations</Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <input 
-                  type="checkbox" 
-                  id="has_tools" 
-                  className="rounded border-slate-300 text-blue-600 shadow-sm focus:ring-blue-500"
+                <CheckboxCard
+                  label="I have my own tools/equipment"
+                  description="Check this if customers do not need to provide tools"
                   {...register("has_tools")}
                   disabled={pending}
                 />
-                <Label htmlFor="has_tools" className="font-normal cursor-pointer">I have my own tools/equipment</Label>
               </div>
             </div>
           </div>

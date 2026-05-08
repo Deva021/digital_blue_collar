@@ -4,7 +4,7 @@ import { useTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, UploadCloud } from "lucide-react";
+import { Loader2, UploadCloud, Info, Lock } from "lucide-react";
 
 import { workerProfileSchema, type WorkerProfileValues } from "@/lib/validations/worker";
 import { updateWorkerProfile } from "@/server/actions/profiles";
@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
+import { CheckboxCard } from "@/components/ui/checkbox-card";
 
 interface WorkerProfileFormProps {
   initialData: {
@@ -124,6 +125,12 @@ export function WorkerProfileForm({ initialData }: WorkerProfileFormProps) {
 
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="bio">Professional Bio</Label>
+              <div className="flex items-start gap-3 p-3 bg-blue-50 text-blue-800 rounded-lg border border-blue-100 mb-2">
+                <Info className="w-5 h-5 shrink-0 mt-0.5 text-blue-600" />
+                <p className="text-sm">
+                  <strong>Tip:</strong> A detailed bio significantly increases your chances of getting hired. Highlight your experience and skills!
+                </p>
+              </div>
               <Textarea 
                 id="bio"
                 placeholder="I am an experienced professional doing..."
@@ -155,67 +162,67 @@ export function WorkerProfileForm({ initialData }: WorkerProfileFormProps) {
               {errors.availability_status && <p className="text-sm text-red-500">{errors.availability_status.message}</p>}
             </div>
 
-            <div className="space-y-2 md:col-span-2 pt-4">
-              <h4 className="text-sm font-semibold text-slate-900 border-b border-slate-100 pb-2">Private Contact Information</h4>
-              <p className="text-xs text-slate-500 mb-4">This information is only shared with customers AFTER they have a confirmed booking with you.</p>
-            </div>
+            <div className="md:col-span-2 mt-4 p-5 bg-amber-50/50 border border-amber-100 rounded-xl space-y-6">
+              <div className="space-y-1 border-b border-amber-200/50 pb-3">
+                <h4 className="flex items-center gap-2 text-sm font-semibold text-amber-900">
+                  <Lock className="w-4 h-4" />
+                  Private Contact Information
+                </h4>
+                <p className="text-xs text-amber-700">This information is only shared with customers AFTER they have a confirmed booking with you.</p>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="contact_phone">Contact Phone</Label>
-              <Input 
-                id="contact_phone"
-                placeholder="e.g. +251 911..."
-                {...register("contact_phone")}
-                disabled={pending}
-              />
-              {errors.contact_phone && <p className="text-sm text-red-500">{errors.contact_phone.message}</p>}
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="contact_phone">Contact Phone</Label>
+                  <Input 
+                    id="contact_phone"
+                    placeholder="e.g. +251 911..."
+                    {...register("contact_phone")}
+                    disabled={pending}
+                  />
+                  {errors.contact_phone && <p className="text-sm text-red-500">{errors.contact_phone.message}</p>}
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="contact_address">Physical Address</Label>
-              <Input 
-                id="contact_address"
-                placeholder="e.g. Bole, House #123"
-                {...register("contact_address")}
-                disabled={pending}
-              />
-              {errors.contact_address && <p className="text-sm text-red-500">{errors.contact_address.message}</p>}
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="contact_address">Physical Address</Label>
+                  <Input 
+                    id="contact_address"
+                    placeholder="e.g. Bole, House #123"
+                    {...register("contact_address")}
+                    disabled={pending}
+                  />
+                  {errors.contact_address && <p className="text-sm text-red-500">{errors.contact_address.message}</p>}
+                </div>
 
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="contact_notes">Contact Notes</Label>
-              <Textarea 
-                id="contact_notes"
-                placeholder="Any additional info on how to reach you..."
-                {...register("contact_notes")}
-                disabled={pending}
-              />
-              {errors.contact_notes && <p className="text-sm text-red-500">{errors.contact_notes.message}</p>}
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="contact_notes">Contact Notes</Label>
+                  <Textarea 
+                    id="contact_notes"
+                    placeholder="Any additional info on how to reach you..."
+                    {...register("contact_notes")}
+                    disabled={pending}
+                  />
+                  {errors.contact_notes && <p className="text-sm text-red-500">{errors.contact_notes.message}</p>}
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="space-y-4 pt-4 border-t border-slate-100">
               <h4 className="text-sm font-medium text-slate-900">Work Logistics</h4>
-              <div className="flex items-center space-x-2">
-                <input 
-                  type="checkbox" 
-                  id="can_travel" 
-                  className="rounded border-slate-300 text-blue-600 shadow-sm focus:ring-blue-500 disabled:opacity-50"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CheckboxCard
+                  label="I am able to travel to customer locations"
+                  description="Check this if you provide mobile services"
                   {...register("can_travel")}
                   disabled={pending}
                 />
-                <Label htmlFor="can_travel" className="font-normal cursor-pointer">I am able to travel to customer locations</Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <input 
-                  type="checkbox" 
-                  id="has_tools" 
-                  className="rounded border-slate-300 text-blue-600 shadow-sm focus:ring-blue-500 disabled:opacity-50"
+                <CheckboxCard
+                  label="I have my own tools/equipment"
+                  description="Check this if customers do not need to provide tools"
                   {...register("has_tools")}
                   disabled={pending}
                 />
-                <Label htmlFor="has_tools" className="font-normal cursor-pointer">I have my own tools/equipment</Label>
               </div>
           </div>
         </CardContent>

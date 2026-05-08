@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { AlertCircle, Upload, CheckCircle2, FileText, Camera } from "lucide-react";
+import { AlertCircle, Upload, CheckCircle2, FileText, Camera, Info } from "lucide-react";
 
 export function VerificationForm() {
   const [isPending, startTransition] = useTransition();
@@ -55,18 +55,24 @@ export function VerificationForm() {
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="w-full max-w-xl mx-auto shadow-xl shadow-slate-200/50 rounded-2xl border-slate-200">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100 rounded-t-2xl">
         <CardTitle>Verify Your Identity</CardTitle>
         <CardDescription>
-          Submit a valid ID document to receive a verified badge on your profile. Verified workers get up to 3x more bookings.
+          Submit a valid ID document to receive a verified badge on your profile.
         </CardDescription>
       </CardHeader>
       <form ref={formRef} onSubmit={handleSubmit}>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-6">
+          <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-100 rounded-xl text-sm text-blue-800">
+            <Info className="w-5 h-5 shrink-0 mt-0.5 text-blue-600" />
+            <p>
+              <strong>Pro Tip:</strong> Verified workers get up to 3x more bookings. Your documents are securely stored and never shared with customers.
+            </p>
+          </div>
           {error && (
-            <div className="p-3 rounded-md bg-red-50 border border-red-200 flex items-start gap-3 text-sm text-red-800">
-              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+            <div className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3 text-sm text-red-800">
+              <AlertCircle className="h-5 w-5 mt-0.5 shrink-0" />
               <p>{error}</p>
             </div>
           )}
@@ -110,10 +116,10 @@ export function VerificationForm() {
             </div>
           </div>
         </CardContent>
-        <CardFooter className="bg-slate-50 px-6 py-4 border-t">
+        <CardFooter className="bg-slate-50/50 px-6 py-4 border-t border-slate-100 rounded-b-2xl">
           <Button 
             type="submit" 
-            className="w-full sm:w-auto ml-auto" 
+            className="w-full sm:w-auto ml-auto px-8" 
             disabled={isPending}
           >
             {isPending ? (
