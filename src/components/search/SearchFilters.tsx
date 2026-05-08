@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { CheckboxCard } from "@/components/ui/checkbox-card";
 import { Filter, Search, X } from "lucide-react";
 import type { CategoryWithChildren } from "@/lib/services/categories";
 
@@ -87,9 +89,8 @@ export function SearchFilters({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="category">Category</Label>
-                <select 
+                <Select 
                   id="category" 
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 >
@@ -102,7 +103,7 @@ export function SearchFilters({
                       ))}
                     </optgroup>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div className="space-y-2">
@@ -115,18 +116,12 @@ export function SearchFilters({
                 />
               </div>
 
-              <div className="space-y-4">
-                <Label>Availability</Label>
-                <div className="flex items-center space-x-2 pt-2">
-                  <input 
-                    type="checkbox" 
-                    id="available" 
-                    checked={available} 
-                    onChange={(e) => setAvailable(e.target.checked)} 
-                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                  />
-                  <Label htmlFor="available" className="font-normal cursor-pointer">Only available now</Label>
-                </div>
+              <div className="space-y-2 pt-6">
+                <CheckboxCard
+                  label="Only available now"
+                  checked={available}
+                  onChange={(e) => setAvailable(e.target.checked)}
+                />
               </div>
             </div>
 

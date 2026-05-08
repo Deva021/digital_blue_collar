@@ -4,6 +4,9 @@ import { useState, useTransition } from "react";
 import { StarRating } from "./StarRating";
 import { createReview } from "@/lib/services/reviews";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 
 interface ReviewSubmissionFormProps {
   bookingId: string;
@@ -44,49 +47,52 @@ export function ReviewSubmissionForm({ bookingId, workerId }: ReviewSubmissionFo
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm mt-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        Leave a Review
-      </h3>
+    <Card className="mt-6 shadow-xl shadow-slate-200/50 rounded-2xl border-slate-200">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100 rounded-t-2xl">
+        <CardTitle>Leave a Review</CardTitle>
+      </CardHeader>
       
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Rate your experience
-          </label>
-          <StarRating rating={rating} onRatingChange={setRating} size={28} />
-        </div>
-
-        <div>
-          <label htmlFor="comment" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Share details of your experience (optional)
-          </label>
-          <textarea
-            id="comment"
-            rows={4}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-            placeholder="How did it go?"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            disabled={isPending}
-            maxLength={1000}
-          />
-        </div>
-
-        {error && (
-          <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm rounded-lg border border-red-100 dark:border-red-900/50">
-            {error}
+      <form onSubmit={handleSubmit}>
+        <CardContent className="space-y-6 pt-6">
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-slate-900">
+              Rate your experience
+            </label>
+            <StarRating rating={rating} onRatingChange={setRating} size={28} />
           </div>
-        )}
 
-        <button
-          type="submit"
-          disabled={isPending || rating === 0}
-          className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
-        >
-          {isPending ? "Submitting..." : "Submit Review"}
-        </button>
+          <div className="space-y-2">
+            <label htmlFor="comment" className="block text-sm font-semibold text-slate-900">
+              Share details of your experience (optional)
+            </label>
+            <Textarea
+              id="comment"
+              rows={4}
+              placeholder="How did it go?"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              disabled={isPending}
+              maxLength={1000}
+            />
+          </div>
+
+          {error && (
+            <div className="p-4 bg-red-50 text-red-700 text-sm rounded-xl border border-red-200">
+              {error}
+            </div>
+          )}
+        </CardContent>
+
+        <CardFooter className="pt-6 border-t border-slate-100 bg-slate-50/50 rounded-b-2xl">
+          <Button
+            type="submit"
+            disabled={isPending || rating === 0}
+            className="w-full sm:w-auto px-8"
+          >
+            {isPending ? "Submitting..." : "Submit Review"}
+          </Button>
+        </CardFooter>
       </form>
-    </div>
+    </Card>
   );
 }

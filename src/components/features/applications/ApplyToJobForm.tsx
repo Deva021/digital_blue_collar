@@ -9,6 +9,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Info } from "lucide-react";
 
 export function ApplyToJobForm({ jobId }: { jobId: string }) {
   const router = useRouter();
@@ -47,16 +50,19 @@ export function ApplyToJobForm({ jobId }: { jobId: string }) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-6 max-w-2xl bg-white p-6 rounded-xl border border-slate-200">
-      {errorMsg && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-md text-sm font-medium border border-red-200">
-          {errorMsg}
-        </div>
-      )}
+    <Card className="w-full max-w-2xl mx-auto shadow-xl shadow-slate-200/50 rounded-2xl border-slate-200">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100 rounded-t-2xl">
+        <CardTitle>Apply for this Job</CardTitle>
+      </CardHeader>
+      <form onSubmit={handleSubmit(onSubmit as any)}>
+        <CardContent className="space-y-6 pt-6">
+          {errorMsg && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+              {errorMsg}
+            </div>
+          )}
 
-      <div className="space-y-4">
-        <h4 className="text-lg font-semibold border-b pb-2">Apply for this Job</h4>
-        
+          <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="proposed_price">Proposed Price (ETB)</Label>
           <Input 
@@ -70,22 +76,30 @@ export function ApplyToJobForm({ jobId }: { jobId: string }) {
 
         <div className="space-y-2">
           <Label htmlFor="application_message">Application Message</Label>
-          <textarea
+          <div className="flex items-start gap-3 p-3 bg-blue-50 text-blue-800 rounded-lg border border-blue-100 mb-2">
+            <Info className="w-5 h-5 shrink-0 mt-0.5 text-blue-600" />
+            <p className="text-sm">
+              <strong>Tip:</strong> Introduce yourself and explain why you're a great fit. Highlight your experience!
+            </p>
+          </div>
+          <Textarea
             id="application_message"
             {...register("application_message")}
             rows={5}
             placeholder="Introduce yourself and explain why you're a good fit..."
-            className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={isPending}
           />
           {errors.application_message && <p className="text-sm text-red-500">{errors.application_message.message}</p>}
         </div>
       </div>
+      </CardContent>
 
-      <div className="pt-4 flex justify-end">
+      <CardFooter className="pt-6 border-t border-slate-100 bg-slate-50/50 rounded-b-2xl flex justify-end">
         <Button type="submit" disabled={isPending} className="w-full sm:w-auto px-8">
           {isPending ? "Submitting Application..." : "Submit Application"}
         </Button>
-      </div>
-    </form>
+      </CardFooter>
+      </form>
+    </Card>
   );
 }
