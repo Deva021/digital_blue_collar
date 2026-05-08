@@ -258,7 +258,8 @@ export interface AdminVerification {
 }
 
 export async function getAdminVerifications(): Promise<AdminVerification[]> {
-  const supabase = await requireAdmin()
+  await requireAdmin()
+  const supabase = createServiceRoleClient()
 
   const { data, error } = await supabase
     .from('verification_requests')
@@ -271,8 +272,21 @@ export async function getAdminVerifications(): Promise<AdminVerification[]> {
     return []
   }
 
+  // Generate signed URLs for the documents
+  const verifications = await Promise.all((data || []).map(async (v) => {
+    if (v.document_url && !v.document_url.startsWith('http')) {
+      const { data: signed } = await supabase.storage
+        .from('verification_documents')
+        .createSignedUrl(v.document_url, 3600)
+      if (signed) {
+        v.document_url = signed.signedUrl
+      }
+    }
+    return v
+  }))
+
   // Sort: pending first, then by date descending
-  const sortedData = [...(data || [])].sort((a, b) => {
+  const sortedData = verifications.sort((a, b) => {
     if (a.status === 'pending' && b.status !== 'pending') return -1
     if (a.status !== 'pending' && b.status === 'pending') return 1
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
