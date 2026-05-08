@@ -39,7 +39,8 @@ export interface AdminOverviewStats {
 }
 
 export async function getAdminOverviewStats(): Promise<AdminOverviewStats> {
-  const supabase = await requireAdmin()
+  await requireAdmin()
+  const supabase = createServiceRoleClient()
 
   const [users, workers, customers, jobs, bookings, verifications, inactiveCategories] =
     await Promise.all([
@@ -75,13 +76,16 @@ export interface AdminUser {
   id: string
   email: string
   is_admin: boolean
+  is_banned: boolean
+  banned_until: string | null
   created_at: string
   has_worker_profile: boolean
   has_customer_profile: boolean
 }
 
 export async function getAdminUsers(): Promise<AdminUser[]> {
-  const supabase = await requireAdmin()
+  await requireAdmin()
+  const supabase = createServiceRoleClient()
 
   const { data, error } = await supabase
     .from('users')
@@ -89,6 +93,8 @@ export async function getAdminUsers(): Promise<AdminUser[]> {
       id,
       email,
       is_admin,
+      is_banned,
+      banned_until,
       created_at,
       worker_profiles ( id ),
       customer_profiles ( id )
@@ -105,6 +111,8 @@ export async function getAdminUsers(): Promise<AdminUser[]> {
     id: u.id,
     email: u.email,
     is_admin: u.is_admin,
+    is_banned: u.is_banned,
+    banned_until: u.banned_until,
     created_at: u.created_at,
     has_worker_profile: Array.isArray(u.worker_profiles)
       ? u.worker_profiles.length > 0
@@ -127,7 +135,8 @@ export interface AdminCategory {
 }
 
 export async function getAdminCategories(): Promise<AdminCategory[]> {
-  const supabase = await requireAdmin()
+  await requireAdmin()
+  const supabase = createServiceRoleClient()
 
   const { data, error } = await supabase
     .from('service_categories')
@@ -173,6 +182,8 @@ export interface AdminJob {
   id: string
   title: string
   status: string
+  is_suspended: boolean
+  suspension_reason: string | null
   budget_range: string | null
   location_text: string | null
   created_at: string
@@ -181,7 +192,8 @@ export interface AdminJob {
 }
 
 export async function getAdminJobs(): Promise<AdminJob[]> {
-  const supabase = await requireAdmin()
+  await requireAdmin()
+  const supabase = createServiceRoleClient()
 
   const { data, error } = await supabase
     .from('job_posts')
@@ -189,6 +201,8 @@ export async function getAdminJobs(): Promise<AdminJob[]> {
       id,
       title,
       status,
+      is_suspended,
+      suspension_reason,
       budget_range,
       location_text,
       created_at,
@@ -207,6 +221,8 @@ export async function getAdminJobs(): Promise<AdminJob[]> {
     id: j.id,
     title: j.title,
     status: j.status,
+    is_suspended: j.is_suspended,
+    suspension_reason: j.suspension_reason,
     budget_range: j.budget_range,
     location_text: j.location_text,
     created_at: j.created_at,
@@ -352,4 +368,79 @@ export async function getAdminVerificationDetail(verificationId: string) {
   }
 
   return data
+}
+
+export async function banUser(userId: string, durationInDays: number | null, reason: string) {
+  await requireAdmin()
+  const supabase = createServiceRoleClient()
+
+  let bannedUntil = null
+  if (durationInDays) {
+    const d = new Date()
+    d.setDate(d.getDate() + durationInDays)
+    bannedUntil = d.toISOString()
+  }
+
+  const { error } = await supabase
+    .from('users')
+    .update({ is_banned: true, banned_until: bannedUntil, ban_reason: reason })
+    .eq('id', userId)
+
+  if (error) {
+    console.error('banUser error:', error)
+    return { success: false, error: error.message }
+  }
+  revalidatePath('/admin/users')
+  return { success: true }
+}
+
+export async function unbanUser(userId: string) {
+  await requireAdmin()
+  const supabase = createServiceRoleClient()
+
+  const { error } = await supabase
+    .from('users')
+    .update({ is_banned: false, banned_until: null, ban_reason: null })
+    .eq('id', userId)
+
+  if (error) {
+    console.error('unbanUser error:', error)
+    return { success: false, error: error.message }
+  }
+  revalidatePath('/admin/users')
+  return { success: true }
+}
+
+export async function suspendJob(jobId: string, reason: string) {
+  await requireAdmin()
+  const supabase = createServiceRoleClient()
+
+  const { error } = await supabase
+    .from('job_posts')
+    .update({ is_suspended: true, suspension_reason: reason })
+    .eq('id', jobId)
+
+  if (error) {
+    console.error('suspendJob error:', error)
+    return { success: false, error: error.message }
+  }
+  revalidatePath('/admin/jobs')
+  return { success: true }
+}
+
+export async function unsuspendJob(jobId: string) {
+  await requireAdmin()
+  const supabase = createServiceRoleClient()
+
+  const { error } = await supabase
+    .from('job_posts')
+    .update({ is_suspended: false, suspension_reason: null })
+    .eq('id', jobId)
+
+  if (error) {
+    console.error('unsuspendJob error:', error)
+    return { success: false, error: error.message }
+  }
+  revalidatePath('/admin/jobs')
+  return { success: true }
 }
