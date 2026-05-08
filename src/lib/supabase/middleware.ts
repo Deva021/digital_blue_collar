@@ -31,6 +31,28 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  if (user) {
+    const { data: userData } = await supabase
+      .from('users')
+      .select('is_banned, banned_until')
+      .eq('id', user.id)
+      .single()
+
+    if (userData?.is_banned) {
+      let isStillBanned = true
+      if (userData.banned_until) {
+        isStillBanned = new Date(userData.banned_until) > new Date()
+      }
+      
+      if (isStillBanned && request.nextUrl.pathname !== '/banned') {
+        // Also clear cookies/session if preferred, but redirecting is fine.
+        const url = request.nextUrl.clone()
+        url.pathname = '/banned'
+        return NextResponse.redirect(url)
+      }
+    }
+  }
+
   // Protect dashboard routes
   const isAuthPage = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup' || request.nextUrl.pathname === '/forgot-password'
   const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/worker') || request.nextUrl.pathname.startsWith('/customer') || request.nextUrl.pathname.startsWith('/onboarding')
