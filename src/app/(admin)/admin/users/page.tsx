@@ -1,5 +1,6 @@
 import { getAdminUsers, type AdminUser } from '@/lib/services/admin'
 import AdminDataTable from '@/components/admin/AdminDataTable'
+import AdminUserActions from '@/components/admin/AdminUserActions'
 import { Badge } from '@/components/ui/badge'
 
 export const metadata = {
@@ -17,6 +18,7 @@ export default async function AdminUsersPage() {
       render: (row: AdminUser) => (
         <div className="flex gap-2">
           {row.is_admin && <Badge variant="default">Admin</Badge>}
+          {row.is_banned && <Badge variant="destructive">Banned</Badge>}
           {row.has_worker_profile && <Badge variant="outline">Worker</Badge>}
           {row.has_customer_profile && <Badge variant="outline">Customer</Badge>}
           {!row.has_worker_profile && !row.has_customer_profile && (
@@ -31,6 +33,11 @@ export default async function AdminUsersPage() {
       render: (row: AdminUser) => new Date(row.created_at).toLocaleDateString(),
     },
     { key: 'id', header: 'User ID' },
+    {
+      key: 'actions',
+      header: 'Actions',
+      render: (row: AdminUser) => <AdminUserActions user={row} />
+    }
   ]
 
   return (

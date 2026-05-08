@@ -1,5 +1,6 @@
 import { getAdminJobs, type AdminJob } from '@/lib/services/admin'
 import AdminDataTable from '@/components/admin/AdminDataTable'
+import AdminJobActions from '@/components/admin/AdminJobActions'
 import { Badge } from '@/components/ui/badge'
 
 export const metadata = {
@@ -22,7 +23,12 @@ export default async function AdminJobsPage() {
           closed: 'outline',
           cancelled: 'destructive',
         }
-        return <Badge variant={variants[row.status] || 'outline'}>{row.status}</Badge>
+        return (
+          <div className="flex gap-2 items-center">
+            <Badge variant={variants[row.status] || 'outline'}>{row.status}</Badge>
+            {row.is_suspended && <Badge variant="destructive">Suspended</Badge>}
+          </div>
+        )
       },
     },
     { key: 'budget_range', header: 'Budget' },
@@ -31,6 +37,11 @@ export default async function AdminJobsPage() {
       header: 'Posted',
       render: (row: AdminJob) => new Date(row.created_at).toLocaleDateString(),
     },
+    {
+      key: 'actions',
+      header: 'Actions',
+      render: (row: AdminJob) => <AdminJobActions job={row} />
+    }
   ]
 
   return (
