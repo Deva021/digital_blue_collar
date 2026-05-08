@@ -7,6 +7,7 @@ export type BookingStatus = typeof bookingStatuses[number];
 export const directBookingSchema = z.object({
   worker_id: z.string().uuid("Invalid worker ID"),
   worker_service_id: z.string().uuid("Invalid service ID").optional(),
+  job_post_id: z.string().uuid("Invalid job post ID").optional(),
   scheduled_at: z
     .string()
     .min(1, "Scheduled date/time is required")
