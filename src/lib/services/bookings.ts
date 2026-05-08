@@ -38,7 +38,7 @@ export async function createDirectBooking(data: DirectBookingInput) {
     return { success: false, error: validated.error.issues[0].message };
   }
 
-  const { worker_id, worker_service_id, scheduled_at, location_text, final_price } = validated.data;
+  const { worker_id, worker_service_id, job_post_id, scheduled_at, location_text, final_price } = validated.data;
 
   // Ensure user has a customer profile
   const { data: customerProfile } = await supabase
@@ -70,6 +70,10 @@ export async function createDirectBooking(data: DirectBookingInput) {
 
   if (worker_service_id) {
     payload.worker_service_id = worker_service_id;
+  }
+  
+  if (job_post_id) {
+    payload.job_post_id = job_post_id;
   }
 
   const { data: booking, error } = await supabase

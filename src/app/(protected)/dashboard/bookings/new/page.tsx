@@ -1,4 +1,5 @@
 import { getPublicServiceById, getWorkerProfileById } from "@/lib/services/worker-profiles";
+import { getCustomerJobs } from "@/lib/services/jobs";
 import { DirectBookingForm } from "@/components/bookings/DirectBookingForm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -33,6 +34,9 @@ export default async function NewBookingPage(props: {
       notFound();
     }
   }
+
+  const allCustomerJobs = await getCustomerJobs();
+  const customerOpenJobs = allCustomerJobs.filter((j: any) => j.status === 'open');
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -73,7 +77,7 @@ export default async function NewBookingPage(props: {
             workerServiceId={service_id}
             serviceLabel={service?.service_categories?.name}
             basePrice={service?.base_price}
-            availableServices={worker.worker_services || []}
+            customerOpenJobs={customerOpenJobs}
           />
         </div>
       </div>

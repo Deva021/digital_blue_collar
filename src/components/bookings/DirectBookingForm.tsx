@@ -12,24 +12,22 @@ type Props = {
   workerServiceId?: string;
   serviceLabel?: string;
   basePrice?: number | null;
-  availableServices?: any[];
+  customerOpenJobs?: any[];
 };
 
 export function DirectBookingForm({
   workerId,
   workerName,
-  workerServiceId: initialWorkerServiceId,
+  workerServiceId,
   serviceLabel,
   basePrice: initialBasePrice,
-  availableServices = [],
+  customerOpenJobs = [],
 }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [workerServiceId, setWorkerServiceId] = useState(initialWorkerServiceId);
-  const [selectedService, setSelectedService] = useState<any>(
-    availableServices.find(s => s.id === initialWorkerServiceId) || null
-  );
+  const [jobPostId, setJobPostId] = useState("");
+  const [selectedJob, setSelectedJob] = useState<any>(null);
 
   const minDateTime = new Date(Date.now() + 5 * 60 * 1000)
     .toISOString()
@@ -48,6 +46,7 @@ export function DirectBookingForm({
       const res = await createDirectBooking({
         worker_id: workerId,
         worker_service_id: workerServiceId,
+        job_post_id: jobPostId || undefined,
         scheduled_at,
         location_text,
         final_price,
@@ -63,35 +62,42 @@ export function DirectBookingForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {workerServiceId ? (
+      {workerServiceId && (
         <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-800">
-          <span className="font-semibold">Booking service: </span>
-          {serviceLabel || selectedService?.service_categories?.name || "Selected Service"}
+          <span className="font-semibold">Booking for service: </span>
+          {serviceLabel || "Selected Service"}
         </div>
-      ) : (
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-slate-700">
-            Select Service <span className="text-red-500">*</span>
-          </label>
+      )}
+
+      <div className="space-y-1.5">
+        <label className="text-sm font-medium text-slate-700">
+          Select Your Job Post <span className="text-red-500">*</span>
+        </label>
+        {customerOpenJobs.length > 0 ? (
           <select 
-            name="worker_service_id" 
+            name="job_post_id" 
             required 
             className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+            value={jobPostId}
             onChange={(e) => {
-              const sId = e.target.value;
-              setWorkerServiceId(sId);
-              setSelectedService(availableServices.find(s => s.id === sId));
+              const jId = e.target.value;
+              setJobPostId(jId);
+              setSelectedJob(customerOpenJobs.find(j => j.id === jId));
             }}
           >
-            <option value="">-- Choose a service --</option>
-            {availableServices.map(s => (
-              <option key={s.id} value={s.id}>
-                {s.service_categories?.name} {s.base_price ? `(ETB ${s.base_price})` : ''}
+            <option value="">-- Choose an open job --</option>
+            {customerOpenJobs.map(j => (
+              <option key={j.id} value={j.id}>
+                {j.title} {j.budget_range ? `(${j.budget_range})` : ''}
               </option>
             ))}
           </select>
-        </div>
-      )}
+        ) : (
+          <div className="text-sm text-amber-700 bg-amber-50 p-3 rounded-md border border-amber-200">
+            You don't have any open job posts. Please create a job post first to hire a worker directly.
+          </div>
+        )}
+      </div>
 
       {errorMsg && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
@@ -155,15 +161,15 @@ export function DirectBookingForm({
           type="number"
           min="1"
           step="0.01"
-          key={selectedService?.id || 'no-service'}
-          defaultValue={selectedService?.base_price || initialBasePrice || ""}
-          placeholder={selectedService?.base_price ? String(selectedService.base_price) : "e.g. 500"}
+          key={selectedJob?.id || 'no-job'}
+          defaultValue={initialBasePrice || ""}
+          placeholder={initialBasePrice ? String(initialBasePrice) : "e.g. 500"}
           required
           className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
         />
-        {(selectedService?.base_price || initialBasePrice) && (
+        {initialBasePrice && (
           <p className="text-xs text-slate-400">
-            Base price: {Number(selectedService?.base_price || initialBasePrice).toLocaleString()} ETB
+            Worker's base price: {Number(initialBasePrice).toLocaleString()} ETB
           </p>
         )}
       </div>
