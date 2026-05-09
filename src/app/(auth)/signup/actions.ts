@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { signupSchema } from '@/lib/validations/auth'
+import { getURL } from '@/lib/utils'
 
 export async function signupAction(prevState: any, formData: FormData) {
   const email = formData.get('email') as string
@@ -14,12 +15,12 @@ export async function signupAction(prevState: any, formData: FormData) {
   }
 
   const supabase = await createClient()
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const baseUrl = getURL()
   const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: `${baseUrl}/auth/callback?next=/dashboard`,
+      emailRedirectTo: `${baseUrl}auth/callback?next=/dashboard`,
     },
   })
 
