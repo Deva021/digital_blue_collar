@@ -16,7 +16,7 @@ export async function signupAction(prevState: any, formData: FormData) {
 
   const supabase = await createClient()
   const baseUrl = getURL()
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -26,6 +26,11 @@ export async function signupAction(prevState: any, formData: FormData) {
 
   if (error) {
     return { error: error.message, success: null }
+  }
+
+  // When email enumeration protection is enabled, existing users return successfully but with an empty identities array
+  if (data?.user && data.user.identities && data.user.identities.length === 0) {
+    return { error: 'An account with this email already exists.', success: null }
   }
 
   return { error: null, success: 'A verification link has been sent to your email address. Please click it to activate your account.' }
