@@ -55,7 +55,7 @@ export async function updateSession(request: NextRequest) {
 
   // Protect dashboard routes
   const isAuthPage = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup' || request.nextUrl.pathname === '/forgot-password'
-  const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/worker') || request.nextUrl.pathname.startsWith('/customer') || request.nextUrl.pathname.startsWith('/onboarding')
+  const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/worker') || request.nextUrl.pathname.startsWith('/customer') || request.nextUrl.pathname.startsWith('/onboarding') || request.nextUrl.pathname === '/update-password'
 
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone()
