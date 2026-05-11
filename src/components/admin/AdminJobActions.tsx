@@ -75,7 +75,7 @@ export default function AdminJobActions({ job }: AdminJobActionsProps) {
       >
         {!job.is_suspended && (
           <div className="space-y-4 py-2">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-neutral-700">Reason</label>
               <textarea 
                 value={reason} 
