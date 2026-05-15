@@ -1,10 +1,27 @@
 import { LoginForm } from '@/components/auth/login-form'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
 
 export default async function LoginPage(props: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const searchParams = await props.searchParams
   const next = typeof searchParams.next === 'string' ? searchParams.next : '/'
+  const code = typeof searchParams.code === 'string' ? searchParams.code : null
+
+  // Handle Supabase PKCE recovery/verification codes that land on the login page
+  // instead of /auth/callback (this happens with password reset emails)
+  if (code) {
+    const supabase = await createClient()
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      // For password reset flows, redirect to update-password
+      // For other flows, use the next param or default to dashboard
+      const destination = next === '/' || next === '/workers' ? '/update-password' : next
+      redirect(destination)
+    }
+    // If code exchange fails, fall through to show login page with error
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 p-4 sm:p-8 relative lg:h-screen lg:overflow-hidden">
