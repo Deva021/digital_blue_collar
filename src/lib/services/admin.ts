@@ -269,6 +269,7 @@ export interface AdminVerification {
   worker_id: string
   status: string
   document_url: string
+  selfie_url: string | null
   admin_notes: string | null
   created_at: string
 }
@@ -279,7 +280,7 @@ export async function getAdminVerifications(): Promise<AdminVerification[]> {
 
   const { data, error } = await supabase
     .from('verification_requests')
-    .select('id, worker_id, status, document_url, admin_notes, created_at')
+    .select('id, worker_id, status, document_url, selfie_url, admin_notes, created_at')
     .order('created_at', { ascending: false })
     .limit(100)
 
@@ -296,6 +297,14 @@ export async function getAdminVerifications(): Promise<AdminVerification[]> {
         .createSignedUrl(v.document_url, 3600)
       if (signed) {
         v.document_url = signed.signedUrl
+      }
+    }
+    if (v.selfie_url && !v.selfie_url.startsWith('http')) {
+      const { data: signed } = await supabase.storage
+        .from('verification_documents')
+        .createSignedUrl(v.selfie_url, 3600)
+      if (signed) {
+        v.selfie_url = signed.signedUrl
       }
     }
     return v

@@ -78,6 +78,7 @@ export default function AdminVerificationsTable({ verifications }: AdminVerifica
               <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">Worker ID</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">Status</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">Document</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">Selfie</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">Admin Notes</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">Submitted</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">Actions</th>
@@ -86,7 +87,7 @@ export default function AdminVerificationsTable({ verifications }: AdminVerifica
           <tbody className="divide-y divide-neutral-100">
             {verifications.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-sm text-neutral-500">
+                <td colSpan={7} className="px-4 py-8 text-center text-sm text-neutral-500">
                   No verification requests found.
                 </td>
               </tr>
@@ -109,6 +110,20 @@ export default function AdminVerificationsTable({ verifications }: AdminVerifica
                     >
                       View Document
                     </a>
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    {v.selfie_url ? (
+                      <a
+                        href={v.selfie_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        View Selfie
+                      </a>
+                    ) : (
+                      <span className="text-neutral-400">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-sm text-neutral-500 max-w-xs truncate" title={v.admin_notes || undefined}>
                     {v.admin_notes || '—'}
