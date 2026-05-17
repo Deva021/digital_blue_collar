@@ -12,15 +12,10 @@ export default async function LoginPage(props: { searchParams: Promise<{ [key: s
   // Handle Supabase PKCE recovery/verification codes that land on the login page
   // instead of /auth/callback (this happens with password reset emails)
   if (code) {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
-      // For password reset flows, redirect to update-password
-      // For other flows, use the next param or default to dashboard
-      const destination = next === '/' || next === '/workers' ? '/update-password' : next
-      redirect(destination)
-    }
-    // If code exchange fails, fall through to show login page with error
+    // We MUST redirect to the Route Handler because Server Components cannot set cookies.
+    // The Route Handler will exchange the code for a session and redirect to the destination.
+    const destination = next === '/' || next === '/workers' ? '/update-password' : next
+    redirect(`/auth/callback?code=${code}&next=${destination}`)
   }
 
   return (
