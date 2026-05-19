@@ -63,6 +63,8 @@ Digital Blue Collar provides a structured digital marketplace where:
 - An admin team moderates the platform, manages categories, and handles verification.
 - Trust is built through identity verification, reviews, and gated contact sharing (contact info is only revealed after booking acceptance).
 
+![Home Page](docs/images/home-page.png)
+
 ---
 
 ## Project Objectives
@@ -76,6 +78,8 @@ Digital Blue Collar provides a structured digital marketplace where:
 | **Trust & Safety**               | Build trust through ID verification, reviews, post-booking contact sharing, and admin moderation    |
 | **Mobile-First & Lightweight**   | Ensure the platform works well on mobile devices with minimal data usage                            |
 | **Admin Oversight**              | Provide platform administrators with tools for user management, moderation, and verification review |
+
+![Mobile View](docs/images/mobile-view.jpg)
 
 ---
 
@@ -98,6 +102,8 @@ Digital Blue Collar provides a structured digital marketplace where:
 - Has a `worker_profile` with bio, availability status, location, and contact details
 - Can list services with pricing, apply to jobs, manage bookings, and request verification
 - Accesses features through the unified `/dashboard` and `/worker/dashboard`
+
+![Worker Profile](docs/images/worker-profile.png)
 
 ### Dual-Role User
 
@@ -131,6 +137,8 @@ Digital Blue Collar provides a structured digital marketplace where:
 | Contact Page    | ✅ Implemented | Contact information                                                                                  |
 | Banned Page     | ✅ Implemented | Landing page shown to banned users                                                                   |
 
+![Worker Listing](docs/images/worker-listing.png)
+
 ### Authentication
 
 | Feature               | Status         | Description                                        |
@@ -153,6 +161,8 @@ Digital Blue Collar provides a structured digital marketplace where:
 | Worker Category Selection   | ✅ Implemented | Checkbox-card form for selecting service categories                                    |
 | Profile Tab Switcher        | ✅ Implemented | Component for switching between profile sections                                       |
 
+![Dashboard](docs/images/dashboard.png)
+
 ### Services & Jobs
 
 | Feature                | Status         | Description                                                                                                |
@@ -173,6 +183,8 @@ Digital Blue Collar provides a structured digital marketplace where:
 | Status Transitions           | ✅ Implemented | Role-aware state machine: pending → accepted → in_progress → completed (or cancelled) |
 | Post-Booking Contact Sharing | ✅ Implemented | Contact info (phone, address, notes) revealed only after booking is accepted          |
 | Booking Notifications        | ✅ Implemented | Automatic notifications on booking creation and status changes                        |
+
+![Booking Detail](docs/images/booking-detail.png)
 
 ### Reviews
 
@@ -214,6 +226,8 @@ Digital Blue Collar provides a structured digital marketplace where:
 | Reports             | 🔲 Planned     | Reports page exists as placeholder                                                                              |
 | Admin Guard         | ✅ Implemented | `requireAdmin()` server-side guard + `is_admin` column protected by DB trigger                                  |
 | Service Role Bypass | ✅ Implemented | Admin queries use `createServiceRoleClient()` to bypass RLS                                                     |
+
+![Admin Dashboard](docs/images/admin-dashboard.png)
 
 ### Design & UX
 
