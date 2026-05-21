@@ -35,7 +35,6 @@
   - [Database Setup](#database-setup)
   - [Running Locally](#running-locally)
 - [Architecture Decisions](#architecture-decisions)
-- [Testing](#testing)
 - [Deployment](#deployment)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -354,7 +353,6 @@ Digital Blue Collar provides a structured digital marketplace where:
 | **Forms**        | React Hook Form + Zod                    | 7.x / 4.x |
 | **Icons**        | Lucide React                             | 1.8.0     |
 | **Utilities**    | clsx, tailwind-merge                     | Latest    |
-| **Testing**      | Vitest                                   | 4.1.5     |
 | **Linting**      | ESLint + eslint-config-next              | 9.x       |
 | **Fonts**        | Geist Sans & Geist Mono (via next/font)  | —         |
 
@@ -413,18 +411,11 @@ digital-blue-collar/
 │   ├── migrations/                 # 16 SQL migration files
 │   ├── seed.sql                    # Category and mock data seeding
 │   └── seed_auth_users.sql         # Auth user seeding for development
-├── db/
-│   ├── migrations/                 # Additional migration files
-│   └── seeds/                      # Additional seed files
 ├── docs/
 │   ├── architecture/               # Architecture documentation
 │   ├── decisions/                  # Decision records and tasks
 │   └── product/                    # Product documentation
 ├── specs/                          # Feature specifications (18 spec directories)
-├── tests/
-│   ├── unit/                       # Unit tests
-│   ├── integration/                # Integration tests
-│   └── e2e/                        # End-to-end tests
 └── package.json
 ```
 
@@ -557,23 +548,6 @@ npm run lint           # Run ESLint
 | **Unified Dashboard**           | Single `/dashboard` entry point for both roles, avoiding split portals                               |
 | **Env Validation**              | Zod schema in `env.ts` validates all required env vars at startup                                    |
 | **Tailwind v4 Theming**         | `@theme inline` block for semantic design tokens (primary, success, error, etc.)                     |
-
----
-
-## Testing
-
-Test infrastructure is set up with **Vitest** and organized into:
-
-```
-tests/
-├── unit/           # Unit tests
-├── integration/    # Integration tests
-└── e2e/            # End-to-end tests
-```
-
-Configuration is in `vitest.config.ts`.
-
-> **Note**: Test coverage is currently minimal and is being expanded. The test directories exist as scaffolding for ongoing development.
 
 ---
 
