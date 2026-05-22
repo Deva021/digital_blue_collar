@@ -66,6 +66,7 @@ export default async function JobApplicationsPage({ params }: { params: Promise<
                 createdAt={app.created_at}
                 jobHasAccepted={hasFilledAllSlots}
                 verificationStatus={app.worker_profiles?.verification_status}
+                guarantorSubmission={Array.isArray(app.guarantor_submissions) ? app.guarantor_submissions[0] : app.guarantor_submissions}
               />
             ))}
           </div>

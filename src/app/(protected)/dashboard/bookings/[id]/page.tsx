@@ -27,12 +27,22 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <Link
-        href="/dashboard/bookings"
-        className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors w-fit"
-      >
-        <ChevronLeft className="w-4 h-4 mr-1" /> Back to My Bookings
-      </Link>
+      <div className="flex justify-between items-center">
+        <Link
+          href="/dashboard/bookings"
+          className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors w-fit"
+        >
+          <ChevronLeft className="w-4 h-4 mr-1" /> Back to My Bookings
+        </Link>
+        {booking.job_post_id && (
+          <Link
+            href={`/dashboard/bookings/${booking.id}/agreement`}
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-blue-50 text-blue-700 hover:bg-blue-100 h-9 px-4 py-2 border border-blue-200"
+          >
+            View Formal Agreement
+          </Link>
+        )}
+      </div>
 
       <BookingDetailView booking={booking} />
 

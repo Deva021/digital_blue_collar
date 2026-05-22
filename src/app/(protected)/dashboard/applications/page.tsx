@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Card, CardTitle, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { ChevronLeft, FileText, Calendar, MapPin } from "lucide-react";
 import { ApplicationStatusBadge } from "@/components/features/applications/ApplicationStatusBadge";
+import { GuarantorLink } from "@/components/features/applications/GuarantorLink";
 
 export default async function WorkerApplicationsPage() {
   const applications = await getWorkerApplications() || [];
@@ -77,6 +78,24 @@ export default async function WorkerApplicationsPage() {
                     <span className="text-xs text-slate-500 block mb-1">Proposed Price</span>
                     <span className="font-semibold text-slate-900">{app.proposed_price} ETB</span>
                   </div>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(Array.isArray(app.guarantor_submissions) ? app.guarantor_submissions[0] : app.guarantor_submissions) && (
+                    <>
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      {(Array.isArray(app.guarantor_submissions) ? app.guarantor_submissions[0] : app.guarantor_submissions).status === 'pending' ? (
+                        <GuarantorLink 
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          submissionId={(Array.isArray(app.guarantor_submissions) ? app.guarantor_submissions[0] : app.guarantor_submissions).id} 
+                        />
+                      ) : (
+                        <div className="w-full mt-2 pt-4 border-t border-slate-200/60">
+                          <span className="text-xs font-medium text-emerald-600 flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Guarantor Submitted
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             </Card>
