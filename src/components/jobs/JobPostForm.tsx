@@ -35,6 +35,7 @@ export function JobPostForm({ categories }: { categories: CategoryWithChildren[]
       budget_range: "",
       is_negotiable: false,
       workers_needed: 1,
+      requires_guarantor: false,
     },
   });
 
@@ -146,6 +147,13 @@ export function JobPostForm({ categories }: { categories: CategoryWithChildren[]
           label="Budget is negotiable"
           description="Check this if you are open to discussing the price"
           {...register("is_negotiable")}
+          disabled={isPending}
+        />
+
+        <CheckboxCard
+          label="Requires Third Accountable Person (Guarantor)"
+          description="Check this for high-risk jobs. Applicants will be required to provide a guarantor before you can hire them."
+          {...register("requires_guarantor")}
           disabled={isPending}
         />
       </div>

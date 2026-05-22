@@ -17,6 +17,7 @@ type ApplicantProps = {
   createdAt: string;
   jobHasAccepted: boolean;
   verificationStatus?: string;
+  guarantorSubmission?: any;
 };
 
 export function ApplicantCard({
@@ -28,6 +29,7 @@ export function ApplicantCard({
   createdAt,
   jobHasAccepted,
   verificationStatus,
+  guarantorSubmission,
 }: ApplicantProps) {
   const [isPending, startTransition] = useTransition();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -187,6 +189,28 @@ export function ApplicantCard({
             </div>
           </div>
 
+          {guarantorSubmission && (
+            <div className="flex flex-col items-end w-full">
+              {guarantorSubmission.status === 'pending' ? (
+                <span className="text-xs font-semibold text-orange-600 bg-orange-50 px-2 py-1 rounded w-fit">Guarantor Pending</span>
+              ) : (
+                <div className="flex flex-col items-end gap-2">
+                  <span className="text-xs font-medium text-emerald-600 flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded w-fit">
+                    <Check className="w-3 h-3" /> Guarantor Verified
+                  </span>
+                  <a 
+                    href={guarantorSubmission.national_id_url} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="text-xs text-blue-600 hover:text-blue-800 underline"
+                  >
+                    View Guarantor ID
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="pt-2 border-t border-slate-200/60 mt-auto">
             {status === "pending" ? (
               !showAcceptForm ? (
@@ -205,8 +229,14 @@ export function ApplicantCard({
                     size="sm"
                     className="w-full bg-emerald-600 hover:bg-emerald-700"
                     onClick={() => setShowAcceptForm(true)}
-                    disabled={isPending || jobHasAccepted}
-                    title={jobHasAccepted ? "Job already has an accepted worker" : ""}
+                    disabled={isPending || jobHasAccepted || (guarantorSubmission && guarantorSubmission.status === 'pending')}
+                    title={
+                      jobHasAccepted 
+                        ? "Job already has an accepted worker" 
+                        : (guarantorSubmission && guarantorSubmission.status === 'pending') 
+                          ? "Waiting for Guarantor" 
+                          : ""
+                    }
                   >
                     <><Check className="w-3.5 h-3.5 mr-1" /> Accept</>
                   </Button>
