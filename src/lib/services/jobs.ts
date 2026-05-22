@@ -126,7 +126,8 @@ export async function getPublicJobById(jobId: string) {
     .eq('job_post_id', jobId)
     .eq('status', 'accepted');
 
-  const hasAcceptedWorker = acceptedCount ? acceptedCount > 0 : false;
+  const workersNeeded = data.workers_needed || 1;
+  const hasAcceptedWorker = acceptedCount !== null ? acceptedCount >= workersNeeded : false;
 
   let isOwner = false;
   let hasApplied = false;

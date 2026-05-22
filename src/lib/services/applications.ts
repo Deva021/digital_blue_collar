@@ -97,7 +97,7 @@ export async function getReceivedApplications(jobId: string) {
   // Verify ownership of the job
   const { data: job, error: jobError } = await supabase
     .from('job_posts')
-    .select('id, title, status, customer_id')
+    .select('id, title, status, customer_id, workers_needed')
     .eq('id', jobId)
     .single();
 
@@ -193,7 +193,7 @@ export async function acceptApplicationAction(
 
   const { data: application, error: appError } = await supabase
     .from('job_applications')
-    .select('*, job_posts(customer_id, id)')
+    .select('*, job_posts(customer_id, id, workers_needed)')
     .eq('id', applicationId)
     .single();
 
@@ -209,7 +209,9 @@ export async function acceptApplicationAction(
     return { success: false, error: "This application has already been reviewed." };
   }
 
-  // Ensure no other accepted application exists for this job
+  const workersNeeded = jobPosts?.workers_needed || 1;
+
+  // Ensure we haven't reached the workers_needed limit
   const { count, error: countError } = await supabase
     .from('job_applications')
     .select('id', { count: 'exact', head: true })
@@ -217,8 +219,8 @@ export async function acceptApplicationAction(
     .eq('status', 'accepted');
 
   if (countError) return { success: false, error: countError.message };
-  if (count && count > 0) {
-    return { success: false, error: "This job already has an accepted worker." };
+  if (count !== null && count >= workersNeeded) {
+    return { success: false, error: `This job has already filled all ${workersNeeded} worker slots.` };
   }
 
   // 1) Update application to accepted
@@ -255,6 +257,25 @@ export async function acceptApplicationAction(
       .eq('id', applicationId);
     console.error("Booking creation error after acceptance:", bookingError);
     return { success: false, error: "Failed to create booking. Application acceptance reverted." };
+  }
+
+  // 3) Auto-cancel remaining and close job if filled
+  const newAcceptedCount = (count || 0) + 1;
+  if (newAcceptedCount >= workersNeeded) {
+    // Auto-reject remaining pending applications
+    await supabase
+      .from('job_applications')
+      .update({ status: 'rejected' })
+      .eq('job_post_id', application.job_post_id)
+      .eq('status', 'pending');
+
+    // Close the job post
+    await supabase
+      .from('job_posts')
+      .update({ status: 'closed' })
+      .eq('id', application.job_post_id);
+      
+    revalidatePath('/jobs');
   }
 
   revalidatePath(`/dashboard/jobs/${application.job_post_id}/applications`);

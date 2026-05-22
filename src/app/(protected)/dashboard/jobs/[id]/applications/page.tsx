@@ -17,8 +17,10 @@ export default async function JobApplicationsPage({ params }: { params: Promise<
 
   const { job, applications } = result;
 
-  // Determine if there is already an accepted application
-  const hasAcceptedApplication = applications.some((app: any) => app.status === 'accepted');
+  // Determine if the job has filled all available slots
+  const acceptedApplicationsCount = applications.filter((app: any) => app.status === 'accepted').length;
+  const workersNeeded = job.workers_needed || 1;
+  const hasFilledAllSlots = acceptedApplicationsCount >= workersNeeded;
 
   return (
     <div className="flex flex-col space-y-6 max-w-5xl mx-auto w-full">
@@ -45,9 +47,9 @@ export default async function JobApplicationsPage({ params }: { params: Promise<
         <div className="space-y-4">
           <div className="flex items-center justify-between py-2">
             <span className="text-sm font-medium text-slate-500">{applications.length} Applicant{applications.length !== 1 && 's'}</span>
-            {hasAcceptedApplication && (
+            {hasFilledAllSlots && (
               <span className="text-sm font-medium text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
-                Worker Selected
+                Workers Selected
               </span>
             )}
           </div>
@@ -62,7 +64,7 @@ export default async function JobApplicationsPage({ params }: { params: Promise<
                 price={app.proposed_price}
                 status={app.status}
                 createdAt={app.created_at}
-                jobHasAccepted={hasAcceptedApplication}
+                jobHasAccepted={hasFilledAllSlots}
                 verificationStatus={app.worker_profiles?.verification_status}
               />
             ))}
