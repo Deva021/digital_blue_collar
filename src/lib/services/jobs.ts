@@ -34,6 +34,7 @@ export async function createJobAction(data: JobPostFormValues) {
     budget_range: validated.data.budget_range,
     is_negotiable: validated.data.is_negotiable,
     workers_needed: validated.data.workers_needed,
+    requires_guarantor: validated.data.requires_guarantor,
     status: 'open'
   };
 

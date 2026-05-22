@@ -8,6 +8,7 @@ export const jobPostSchema = z.object({
   budget_range: z.string().optional(),
   is_negotiable: z.boolean(),
   workers_needed: z.number().min(1, "At least 1 worker is required").max(100, "Maximum 100 workers allowed"),
+  requires_guarantor: z.boolean(),
 });
 
 export type JobPostFormValues = z.infer<typeof jobPostSchema>;

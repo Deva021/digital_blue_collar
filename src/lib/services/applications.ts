@@ -22,7 +22,7 @@ export async function applyToJobAction(data: ApplicationFormValues) {
   // Ensure job is open
   const { data: job } = await supabase
     .from('job_posts')
-    .select('status, customer_id')
+    .select('status, customer_id, requires_guarantor')
     .eq('id', validated.data.job_id)
     .single();
 
@@ -38,7 +38,11 @@ export async function applyToJobAction(data: ApplicationFormValues) {
     status: 'pending'
   };
 
-  const { error } = await supabase.from('job_applications').insert(payload);
+  const { data: applicationData, error } = await supabase
+    .from('job_applications')
+    .insert(payload)
+    .select('id')
+    .single();
   
   if (error) {
     // 23505 is the PostgreSQL unique violation error code
@@ -47,6 +51,18 @@ export async function applyToJobAction(data: ApplicationFormValues) {
     }
     console.error("Application insertion error:", error);
     return { success: false, error: error.message };
+  }
+
+  // If the job requires a guarantor, initialize a pending guarantor submission
+  if (job.requires_guarantor && applicationData) {
+    const { error: guarantorError } = await supabase
+      .from('guarantor_submissions')
+      .insert({ application_id: applicationData.id, status: 'pending' });
+    
+    if (guarantorError) {
+      console.error("Guarantor submission init error:", guarantorError);
+      // We don't block the application but we should log it
+    }
   }
 
   revalidatePath('/jobs');
@@ -77,6 +93,10 @@ export async function getWorkerApplications() {
       job_posts (
         title,
         location_text
+      ),
+      guarantor_submissions (
+        id,
+        status
       )
     `)
     .eq('worker_id', authData.user.id)
@@ -114,6 +134,12 @@ export async function getReceivedApplications(jobId: string) {
         bio,
         location_text,
         verification_status
+      ),
+      guarantor_submissions (
+        status,
+        full_name,
+        fan_number,
+        national_id_url
       )
     `)
     .eq('job_post_id', jobId)
@@ -292,4 +318,80 @@ export async function acceptApplicationAction(
   );
 
   return { success: true, bookingId: booking.id };
+}
+export async function submitGuarantorAction(id: string, formData: FormData) {
+  const supabase = await createClient();
+  
+  const fullName = formData.get('full_name') as string;
+  const fanNumber = formData.get('fan_number') as string;
+  const signatureData = formData.get('signature_data') as string;
+  const idFile = formData.get('id_file') as File;
+
+  if (!fullName || !fanNumber || !signatureData || !idFile) {
+    return { success: false, error: "All fields are required." };
+  }
+
+  // 1. Verify the guarantor submission exists and is pending
+  const { data: guarantor, error: fetchError } = await supabase
+    .from('guarantor_submissions')
+    .select('id, status')
+    .eq('id', id)
+    .single();
+
+  if (fetchError || !guarantor) {
+    return { success: false, error: "Invalid link." };
+  }
+  
+  if (guarantor.status !== 'pending') {
+    return { success: false, error: "This link has already been submitted." };
+  }
+
+  // 2. Upload ID File to Supabase Storage
+  const fileExt = idFile.name.split('.').pop();
+  const filePath = `${id}-${Date.now()}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('guarantor_documents')
+    .upload(filePath, idFile, { upsert: true });
+
+  if (uploadError) {
+    console.error("Storage upload error:", uploadError);
+    return { success: false, error: "Failed to upload ID document." };
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from('guarantor_documents')
+    .getPublicUrl(filePath);
+
+  // 3. Update Guarantor Submission
+  const { error: updateError } = await supabase
+    .from('guarantor_submissions')
+    .update({
+      status: 'submitted',
+      full_name: fullName,
+      fan_number: fanNumber,
+      national_id_url: publicUrlData.publicUrl,
+      signature_data: signatureData,
+      submitted_at: new Date().toISOString()
+    })
+    .eq('id', id);
+
+  if (updateError) {
+    console.error("Guarantor update error:", updateError);
+    return { success: false, error: "Failed to submit data." };
+  }
+
+  return { success: true };
+}
+
+export async function getGuarantorSubmission(id: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('guarantor_submissions')
+    .select('id, status, job_applications(job_posts(title))')
+    .eq('id', id)
+    .single();
+
+  if (error || !data) return null;
+  return data;
 }
