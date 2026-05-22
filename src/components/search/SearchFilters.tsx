@@ -23,6 +23,8 @@ export function SearchFilters({
   const [location, setLocation] = useState(searchParams.get("location") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
   const [available, setAvailable] = useState(searchParams.get("available") === "true");
+  const [dateRange, setDateRange] = useState(searchParams.get("dateRange") || "");
+  const [specificDate, setSpecificDate] = useState(searchParams.get("specificDate") || "");
   
   const [showFilters, setShowFilters] = useState(false);
 
@@ -34,6 +36,8 @@ export function SearchFilters({
     if (location) params.set("location", location); else params.delete("location");
     if (category) params.set("category", category); else params.delete("category");
     if (available) params.set("available", "true"); else params.delete("available");
+    if (dateRange) params.set("dateRange", dateRange); else params.delete("dateRange");
+    if (specificDate) params.set("specificDate", specificDate); else params.delete("specificDate");
 
     params.delete("page");
     router.push(pathname + "?" + params.toString());
@@ -45,11 +49,13 @@ export function SearchFilters({
     setLocation("");
     setCategory("");
     setAvailable(false);
+    setDateRange("");
+    setSpecificDate("");
     router.push(pathname);
     setShowFilters(false);
   };
 
-  const hasActiveFilters = location || category || available;
+  const hasActiveFilters = !!(location || category || available || dateRange || specificDate);
 
   return (
     <div className="w-full mb-8">
@@ -115,6 +121,36 @@ export function SearchFilters({
                   placeholder="E.g. Addis Ababa" 
                 />
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="dateRange">Posted Date</Label>
+                <Select 
+                  id="dateRange" 
+                  value={dateRange}
+                  onChange={(e) => {
+                    setDateRange(e.target.value);
+                    if (e.target.value !== "specific") setSpecificDate("");
+                  }}
+                >
+                  <option value="">Anytime</option>
+                  <option value="today">Past 24 Hours</option>
+                  <option value="week">Past Week</option>
+                  <option value="month">Past Month</option>
+                  <option value="specific">Specific Date</option>
+                </Select>
+              </div>
+
+              {dateRange === "specific" && (
+                <div className="space-y-2">
+                  <Label htmlFor="specificDate">Select Date</Label>
+                  <Input 
+                    id="specificDate" 
+                    type="date"
+                    value={specificDate} 
+                    onChange={(e) => setSpecificDate(e.target.value)} 
+                  />
+                </div>
+              )}
 
               <div className="space-y-2 pt-6">
                 <CheckboxCard

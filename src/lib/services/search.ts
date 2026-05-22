@@ -7,6 +7,8 @@ export interface SearchFilters {
   available?: string;
   sort?: string;
   page?: string;
+  dateRange?: string;
+  specificDate?: string;
 }
 
 export async function getPublicWorkers(filters: SearchFilters) {
@@ -130,6 +132,27 @@ export async function searchJobs(filters: SearchFilters) {
       orFilter += `,category_id.in.(${matchedCategoryIds.join(',')})`;
     }
     query = query.or(orFilter);
+  }
+
+  if (filters.specificDate) {
+    const startOfDay = new Date(filters.specificDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(filters.specificDate);
+    endOfDay.setHours(23, 59, 59, 999);
+    query = query.gte("created_at", startOfDay.toISOString());
+    query = query.lte("created_at", endOfDay.toISOString());
+  } else if (filters.dateRange) {
+    const now = new Date();
+    if (filters.dateRange === "today") {
+      const past24h = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+      query = query.gte("created_at", past24h);
+    } else if (filters.dateRange === "week") {
+      const pastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      query = query.gte("created_at", pastWeek);
+    } else if (filters.dateRange === "month") {
+      const pastMonth = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      query = query.gte("created_at", pastMonth);
+    }
   }
 
   if (filters.sort === "oldest") {

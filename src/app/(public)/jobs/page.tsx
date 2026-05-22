@@ -12,6 +12,8 @@ export default async function JobsPage(props: { searchParams?: Promise<{ [key: s
     location: typeof searchParams?.location === 'string' ? searchParams.location : undefined,
     available: typeof searchParams?.available === 'string' ? searchParams.available : undefined,
     sort: typeof searchParams?.sort === 'string' ? searchParams.sort : undefined,
+    dateRange: typeof searchParams?.dateRange === 'string' ? searchParams.dateRange : undefined,
+    specificDate: typeof searchParams?.specificDate === 'string' ? searchParams.specificDate : undefined,
     page: typeof searchParams?.page === 'string' ? searchParams.page : '1',
   };
 
