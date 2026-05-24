@@ -131,6 +131,7 @@ export async function getReceivedApplications(jobId: string) {
       *,
       worker_profiles (
         id,
+        full_name,
         bio,
         location_text,
         verification_status

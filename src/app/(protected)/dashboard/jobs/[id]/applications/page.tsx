@@ -59,7 +59,7 @@ export default async function JobApplicationsPage({ params }: { params: Promise<
               <ApplicantCard
                 key={app.id}
                 applicationId={app.id}
-                workerName={'Professional Worker'}
+                workerName={app.worker_profiles?.full_name || 'Professional Worker'}
                 message={app.message}
                 price={app.proposed_price}
                 status={app.status}
